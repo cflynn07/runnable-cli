@@ -32,6 +32,8 @@
     "standard": "^5.4.1"
   },
   "dependencies": {
+    "colors": "^1.1.2",
+    "commander": "^2.9.0",
     "primus": "^4.0.4",
     "qs": "^6.0.1",
     "substream": "^0.2.0",
