@@ -1,0 +1,35 @@
+{
+  "name": "runnable-cli",
+  "version": "0.0.0",
+  "description": "A command line interface for the runnable developer sandbox platform",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "babel ./src -d ./lib",
+    "prepublish": "npm run build",
+    "test": "npm run build; lab -c -v lib/",
+    "test-cov": "mkdir coverage; touch coverage/coverage.html; rm coverage/coverage.html; lab -c -r html lib/ > coverage/coverage.html; open -a 'Google Chrome' coverage/coverage.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cflynn07/runnable-cli.git"
+  },
+  "author": "Casey Flynn <cflynn.us@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cflynn07/runnable-cli/issues"
+  },
+  "homepage": "https://github.com/cflynn07/runnable-cli",
+  "devDependencies": {
+    "babel-cli": "^6.3.17",
+    "babel-preset-es2015": "^6.3.13",
+    "code": "^2.1.0",
+    "lab": "^8.0.1"
+  },
+  "dependencies": {
+    "primus": "^4.0.4",
+    "qs": "^6.0.1",
+    "substream": "^0.2.0",
+    "uuid": "^2.0.1",
+    "ws": "^1.0.0"
+  }
+}
