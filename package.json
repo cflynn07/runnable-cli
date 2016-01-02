@@ -4,7 +4,7 @@
   "description": "A command line interface for the runnable developer sandbox platform",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel ./src -d ./",
+    "build": "babel ./src -d ./lib",
     "lint": "standard -v",
     "prepublish": "npm run build",
     "test": "npm run build; lab -c -v lib/",
