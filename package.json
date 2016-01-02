@@ -4,7 +4,7 @@
   "description": "A command line interface for the runnable developer sandbox platform",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel ./src -d ./lib",
+    "build": "babel ./src -d ./",
     "prepublish": "npm run build",
     "test": "npm run build; lab -c -v lib/",
     "test-cov": "mkdir coverage; touch coverage/coverage.html; rm coverage/coverage.html; lab -c -r html lib/ > coverage/coverage.html; open -a 'Google Chrome' coverage/coverage.html"
