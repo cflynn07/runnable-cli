@@ -35,11 +35,19 @@ class API {
     var git = new Git()
     return git.fetchRepositoryInfo()
       .then((repoData) => {
+        var instanceName = this._computeInstanceName(repoData.branch, repoData.repoName)
+
+        /**
+         * TEMP
+         */
+        repoData.orgName = 'codenow'
+        instanceName = 'api'
+
         return this._request({
           url: '/instances',
           qs: {
             githubUsername: repoData.orgName,
-            name: this._computeInstanceName(repoData.branch, repoData.repoName)
+            name: instanceName
           }
         })
         .then((response) => {
@@ -52,7 +60,10 @@ class API {
   }
 
   /**
-   *
+   * Generate Runnable instance name based on name pattern
+   * @param {String} branch
+   * @param {String} repo
+   * @return String
    */
   _computeInstanceName (branch, repo) {
     if (branch === 'master') {

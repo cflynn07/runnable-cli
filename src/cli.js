@@ -49,7 +49,13 @@ class CLI {
 
     program
       .command('status')
+      .option('-e', 'Show environment variables')
+      .description('description foo here')
       .action(this._cmdStatus)
+
+    program
+      .command('browse')
+      .action(this._cmdBrowse)
 
     program
       .command('*')
@@ -129,9 +135,16 @@ class CLI {
   /**
    *
    */
-  _cmdStatus () {
+  _cmdBrowse () {
+  }
+
+  /**
+   * @param {Array} subVars optional variadic arguments
+   *   - env
+   */
+  _cmdStatus (options) {
     api.fetchInstanceInfo()
-      .then(status)
+      .then(status.bind(this, options))
       .catch((err) => {
         console.log(err.message, err.stack)
       })
