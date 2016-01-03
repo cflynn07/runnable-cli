@@ -40,6 +40,7 @@
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "keypather": "^1.10.1",
+    "keypress": "^0.2.1",
     "primus": "^4.0.4",
     "qs": "^6.0.1",
     "request": "^2.67.0",
