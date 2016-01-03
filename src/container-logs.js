@@ -1,13 +1,12 @@
 /**
  * @module lib/container-logs
- * @exports {Function} ContainerLogs
+ * @exports {Class} ContainerLogs
  */
 'use strict'
 
-var Primus = require('primus')
 var Promise = require('bluebird')
-var http = require('http')
-var substream = require('substream')
+
+var socket = require('./socket')
 
 class ContainerLogs {
   /**
@@ -17,22 +16,12 @@ class ContainerLogs {
   constructor (dockerHost, dockerContainer) {
     this._dockerHost = dockerHost
     this._dockerContainer = dockerContainer
-    var server = http.createServer()
-    var primus = new Primus(server, {
-      transformer: 'websockets',
-      parser: 'JSON',
-      plugin: {
-        substream: substream
-      }
-    })
-    this._client = new primus.Socket('https://api.runnable.io?token=' +
-                                     process.env.RUNNABLE_SOCKET_TOKEN)
+    this._client = socket()
     this._logStream = this._client.substream(1)
   }
+
   /**
    * Fetch a running containers stdout stream and pipe to process.stdout
-   * @param {String} dockerHost
-   * @param {String} dockerContainer
    */
   fetchAndPipeToStdout () {
     this._client.on('data', (data) => {
@@ -49,6 +38,7 @@ class ContainerLogs {
       }
     })
   }
+
   /**
    * Converts string of bytes represented in hexadecimal format to ASCII
    * @param {String} hexString

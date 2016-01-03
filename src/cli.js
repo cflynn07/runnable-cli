@@ -10,7 +10,9 @@ var fs = require('fs')
 var program = require('commander')
 
 var ContainerLogs = require('./container-logs')
+var Terminal = require('./terminal')
 var api = require('./api')
+var status = require('./status')
 
 class CLI {
   constructor () {
@@ -22,8 +24,32 @@ class CLI {
       .action(this._cmdLogs)
 
     program
+      .command('terminal')
+      .action(this._cmdTerminal)
+
+    program
+      .command('start')
+      .action(this._cmdStart)
+
+    program
       .command('stop')
       .action(this._cmdStop)
+
+    program
+      .command('restart')
+      .action(this._cmdRestart)
+
+    program
+      .command('rebuild')
+      .action(this._cmdRebuild)
+
+    program
+      .command('list')
+      .action(this._cmdList)
+
+    program
+      .command('status')
+      .action(this._cmdStatus)
 
     program
       .command('*')
@@ -35,6 +61,7 @@ class CLI {
       program.help()
     }
   }
+
   /**
    * Tail the CMD logs of a container on Runnable.
    * Attempts to determine which container to use from the origin remote of the current git repo
@@ -44,15 +71,70 @@ class CLI {
     // codenow: 
     // Ex: http://api.runnable.io/instances/?githubUsername=codenow&name=api
     api.fetchInstanceInfo() // TODO: Add org and name args here for manual specification
-      .then((data) => {
-        var containerLogs = new ContainerLogs(data.dockerHost, data.dockerContainer)
+      .then((instance) => {
+        var containerLogs = new ContainerLogs(instance.container.dockerHost,
+                                              instance.container.dockerContainer)
         containerLogs.fetchAndPipeToStdout()
       })
       .catch((err) => {
         console.log(err.message)
       });
   }
+
+  /**
+   *
+   */
+  _cmdTerminal () {
+    api.fetchInstanceInfo()
+      .then((instance) => {
+        var terminal = new Terminal(instance.container.dockerHost,
+                                    instance.container.dockerContainer)
+        terminal.fetchAndPipeToStdout()
+      })
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
+  }
+
+  /**
+   *
+   */
+  _cmdStart () {
+  }
+
+  /**
+   *
+   */
   _cmdStop () {
+  }
+
+  /**
+   *
+   */
+  _cmdRestart () {
+  }
+
+  /**
+   *
+   */
+  _cmdRebuild () {
+  }
+
+  /**
+   *
+   */
+  _cmdList () {
+  }
+
+  /**
+   *
+   */
+  _cmdStatus () {
+    api.fetchInstanceInfo()
+      .then(status)
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
   }
 }
 

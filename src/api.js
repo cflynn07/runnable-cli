@@ -1,6 +1,6 @@
 /**
  * @module lib/api
- * @exports {Function} API
+ * @exports {Object} API
  */
 'use strict'
 
@@ -24,6 +24,7 @@ class API {
     this._request = Promise.promisify(this._request)
     Promise.promisifyAll(this._request)
   }
+
   /**
    * Fetch instance object from API
    * @returns {Object} Promise, if successful, will resolve with object:
@@ -32,31 +33,33 @@ class API {
    */
   fetchInstanceInfo () {
     var git = new Git()
-
     return git.fetchRepositoryInfo()
       .then((repoData) => {
         return this._request({
           url: '/instances',
           qs: {
             githubUsername: repoData.orgName,
-            name: repoData.branch + '-' + repoData.repoName
+            name: this._computeInstanceName(repoData.branch, repoData.repoName)
           }
         })
         .then((response) => {
           if (!response.body || !response.body.length) {
             throw new Error('Instance not found')
           }
-          var instance = response.body[0]
-          var instanceData = {
-            dockerContainer: keypather.get(instance, 'container.dockerContainer'),
-            dockerHost: keypather.get(instance, 'container.dockerHost')
-          }
-          if (!instanceData.dockerContainer) {
-            throw new Error('Instance does not have a container')
-          }
-          return instanceData
+          return response.body[0]
         })
       })
+  }
+
+  /**
+   *
+   */
+  _computeInstanceName (branch, repo) {
+    if (branch === 'master') {
+      return repo
+    } else {
+      return branch + '-' + repo
+    }
   }
 }
 
