@@ -1,21 +1,29 @@
 #!/usr/bin/env node
 
 /**
- * @module bin/cli
+ * @module lib/cli
+ * @exports {Object} instanceOf CLI
  */
 'use strict'
 
 var fs = require('fs')
 var program = require('commander')
 
+var ContainerLogs = require('./container-logs')
+var api = require('./api')
+
 class CLI {
   constructor () {
-    var packageJSON = JSON.parse(fs.readFileSync('../package.json'))
-    program.version(packageJSON.version)
+    //var packageJSON = JSON.parse(fs.readFileSync('../package.json'))
+    //program.version(packageJSON.version)
 
     program
       .command('logs')
       .action(this._cmdLogs)
+
+    program
+      .command('stop')
+      .action(this._cmdStop)
 
     program
       .command('*')
@@ -27,26 +35,25 @@ class CLI {
       program.help()
     }
   }
+  /**
+   * Tail the CMD logs of a container on Runnable.
+   * Attempts to determine which container to use from the origin remote of the current git repo
+   */
   _cmdLogs () {
-    console.log('hi!')
+    // Fetch instance from API
+    // codenow: 
+    // Ex: http://api.runnable.io/instances/?githubUsername=codenow&name=api
+    api.fetchInstanceInfo() // TODO: Add org and name args here for manual specification
+      .then((data) => {
+        var containerLogs = new ContainerLogs(data.dockerHost, data.dockerContainer)
+        containerLogs.fetchAndPipeToStdout()
+      })
+      .catch((err) => {
+        console.log(err.message)
+      });
+  }
+  _cmdStop () {
   }
 }
 
 module.exports = new CLI()
-
-/*
-program
-  .command('logs [something]')
-  .description('view logs')
-  .action(function () {
-    console.log('action', arguments)
-  })
-  .command('build-logs', 'view build logs')
-  // .command('terminal', 'terminal', { isDefault: true })
-  .command('status', 'container status')
-  .command('list', 'list containers based on this repository')
-  .command('rebuild', 'rebuild a container')
-  // .command('upload', '')
-  // .command('relaunch')
-  .parse(process.argv)
-*/
