@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "A command line interface for the runnable developer sandbox platform",
   "main": "lib/index.js",
+  "bin": {
+    "runnable": "./lib/cli.js"
+  },
   "scripts": {
     "build": "babel ./src -d ./lib",
     "lint": "standard -v",
@@ -32,9 +35,11 @@
     "standard": "^5.4.1"
   },
   "dependencies": {
+    "101": "^1.2.0",
     "bluebird": "^3.1.1",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
+    "keypather": "^1.10.1",
     "primus": "^4.0.4",
     "qs": "^6.0.1",
     "request": "^2.67.0",
