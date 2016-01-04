@@ -13,7 +13,7 @@ class API {
   constructor () {
     var apiUrl = process.env.RUNNABLE_CLI_HOST || 'https://api.runnable.io'
     this._jar = request.jar()
-    this._jar.setCookie('connect.sid=s%3AyJNlxIhdkGgRCfpQEeai-V7KXIMDXC4r.xE4zX4GSZKL76N97M5gndfoU270BydeqRaHKMN3co3k; Domain=api.runnable.io; Path=/;', 'https://api.runnable.io')
+    this._jar.setCookie(process.env.RUNNABLE_COOKIE, 'https://api.runnable.io')
     this._request = request.defaults({
       baseUrl: apiUrl,
       jar: this._jar,

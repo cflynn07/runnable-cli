@@ -26,27 +26,27 @@ class CLI {
     program.version(packageJSON.version)
 
     program
-      .command('logs', 'Tail the stdout of a Runnable server')
+      .command('logs', null, 'Tail the stdout of a Runnable server')
       .action(this._cmdLogs)
 
     program
-      .command('ssh', 'Open a remote terminal session in a Runnable server')
+      .command('ssh', null, 'Open a remote terminal session in a Runnable server')
       .action(this._cmdSSH)
 
     program
-    .command('start', 'Start a Runnable server')
+    .command('start', null, 'Start a Runnable server')
       .action(this._cmdStart)
 
     program
-      .command('stop', 'Stop a Runnable server')
+      .command('stop', null, 'Stop a Runnable server')
       .action(this._cmdStop)
 
     program
-      .command('restart', 'Restart a Runnable server')
+      .command('restart', null, 'Restart a Runnable server')
       .action(this._cmdRestart)
 
     program
-      .command('rebuild', 'Rebuild a Runnable server')
+      .command('rebuild', null, 'Rebuild a Runnable server')
       .action(this._cmdRebuild)
 
     program
@@ -54,12 +54,12 @@ class CLI {
       .action(this._cmdList)
 
     program
-      .command('status', 'Show a Runnable server status')
+      .command('status', null, 'Show a Runnable server status')
       .option('-e', 'Show the Runnable server environment variables')
       .action(this._cmdStatus)
 
     program
-      .command('browse [target]', 'Open a Runnable page in the default browser')
+      .command('browse [target]', null, 'Open a Runnable page in the default browser')
       .action(this._cmdBrowse)
 
     program
