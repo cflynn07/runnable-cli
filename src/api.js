@@ -4,6 +4,7 @@
  */
 'use strict'
 
+var Immutable = require('immutable')
 var Promise = require('bluebird')
 var request = require('request')
 
@@ -24,16 +25,18 @@ class API {
   }
 
   /**
-   * Fetch instance object from API
-   * @returns {Object} Promise, if successful, will resolve with object:
-   *   - dockHost
-   *   - containerId
+   * Fetch an instance object from API
+   * @returns Promise - resolves:
+   *   Object: <immutable>
+   *     - dockHost
+   *     - containerId
    */
   fetchInstance () {
     var git = new Git()
+    var instanceName;
     return git.fetchRepositoryInfo()
       .then((repoData) => {
-        var instanceName = this._computeInstanceName(repoData.branch, repoData.repoName)
+        instanceName = this._computeInstanceName(repoData.branch, repoData.repoName)
         return this._request({
           url: '/instances',
           qs: {
@@ -43,9 +46,37 @@ class API {
         })
         .then((response) => {
           if (!response.body || !response.body.length) {
-            throw new Error('Instance not found')
+            throw new Error('Instance not found: ' +
+                            repoData.orgName.toLowerCase() + '/' + instanceName.toLowerCase())
           }
-          return response.body[0]
+          return reponse.body[0]
+          // return Immutable.Map(response.body[0])
+        })
+      })
+  }
+
+  /**
+   * Fetch collection of instances from API
+   * @return Promise - resolves:
+   *   Array:
+   *     Object<instance>
+   */
+  fetchInstances () {
+    var git = new Git()
+    return git.fetchRepositoryInfo()
+      .then((repoData) => {
+        return this._request({
+          url: '/instances',
+          qs: {
+            githubUsername: repoData.orgName.toLowerCase(),
+            ignoredFields: 'contextVersions,build.log,contextVersion.build.log'
+          }
+        })
+        .then((response) => {
+          if (!response.body || !response.body.length) {
+            throw new Error('Instances not found')
+          }
+          return response.body;
         })
       })
   }
