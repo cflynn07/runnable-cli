@@ -4,7 +4,7 @@
 
 The Runnable CLI is an interface to the Runnable Platform API. Supported features include log
 tailing, terminal sessions, starting/stopping/restarting Servers, status inspection, etc. Use the
-CLI to interact conveniently with Runnable from your development environment.
+CLI to conveniently interact with Runnable from your development environment.
 
 Overview
 --------
