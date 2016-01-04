@@ -66,6 +66,19 @@ class API {
   }
 
   /**
+   *
+   */
+  stopInstance () {
+    return this.fetchInstance()
+      .then((instance) => {
+        return this._request({
+          method: 'PUT',
+          url: ['/instances/', instance.id, '/actions/stop'].join('')
+        })
+      })
+  }
+
+  /**
    * Generate Runnable instance name based on name pattern
    * @param {String} branch
    * @param {String} repo

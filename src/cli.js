@@ -114,7 +114,7 @@ class CLI {
         var output = ['https://runnable.io',
           response.body.owner.username,
           response.body.lowerName].join('/') + '\n'
-        output += 'Starting your container...'
+        output += 'Starting container...'
         console.log(output.magenta)
       })
       .catch((err) => {
@@ -126,6 +126,18 @@ class CLI {
    *
    */
   _cmdStop () {
+    api.stopInstance()
+      .then((response) => {
+        var output = ['https://runnable.io',
+          response.body.owner.username,
+          response.body.lowerName].join('/') + '\n'
+        output += 'Stopping container...'
+        console.log(output.magenta)
+      })
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
+
   }
 
   /**
@@ -153,8 +165,7 @@ class CLI {
   }
 
   /**
-   * @param {Array} subVars optional variadic arguments
-   *   - env
+   *
    */
   _cmdStatus (options) {
     api.fetchInstance()
