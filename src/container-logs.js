@@ -24,7 +24,8 @@ class ContainerLogs {
   fetchAndPipeToStdout () {
     this._client.on('data', (data) => {
       if (!data.args) { return }
-      process.stdout.write(this._convertHexToASCII(data.args))
+      if (parseInt(data.args.substr(0, 2), 16) < 31) { return }
+      console.log(this._convertHexToASCII(data.args).replace(/\n$/, ''))
     })
     this._client.write({
       id: 1,
