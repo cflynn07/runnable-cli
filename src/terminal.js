@@ -54,7 +54,9 @@ class Terminal {
     process.stdin.resume()
 
     this._client.on('data', (data) => {
-      //console.log('client data', data)
+      if (keypather.get(data, 'args') === 'substream::end') {
+        process.exit(0)
+      }
     })
     this._client.write({
       id: 1,
