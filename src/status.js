@@ -4,13 +4,12 @@
  */
 
 require('colors')
-
 var Table = require('cli-table')
 var keypather = require('keypather')()
 var moment = require('moment')
 
 /**
- * Produce template string of instance information and output to stdout
+ * Create a formatted table from instance object property values. Output to stdout.
  * @param {Object} instance
  */
 module.exports = (options, instance) => {

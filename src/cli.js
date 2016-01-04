@@ -6,7 +6,6 @@
  */
 'use strict'
 
-// Mutates String.prototype globally, only require once in init module
 require('colors')
 
 var open = require('open')
@@ -19,6 +18,9 @@ var api = require('./api')
 var packageJSON = require('../package.json')
 var status = require('./status')
 
+/**
+ * Main CLI class. The constructor function is the program entry point.
+ */
 class CLI {
   constructor () {
     program.version(packageJSON.version)
