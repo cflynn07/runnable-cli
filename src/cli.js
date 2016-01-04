@@ -137,13 +137,24 @@ class CLI {
       .catch((err) => {
         console.log(err.message, err.stack)
       })
-
   }
 
   /**
    *
    */
   _cmdRestart () {
+    api.restartInstance()
+      .then((response) => {
+        var output = ['https://runnable.io',
+          response.body.owner.username,
+          response.body.lowerName].join('/') + '\n'
+        output += 'Restarting container...'
+        console.log(output.magenta)
+      })
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
+
   }
 
   /**
