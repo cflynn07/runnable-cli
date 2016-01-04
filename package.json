@@ -8,9 +8,9 @@
   },
   "scripts": {
     "build": "babel ./src -d ./lib",
-    "lint": "standard -v",
+    "lint": "standard -v src/**/*.js",
     "prepublish": "npm run build",
-    "test": "npm run build; lab -c -v lib/",
+    "test": "npm run lint; npm run build; lab -c -v lib/**/*_test.js",
     "test-cov": "mkdir coverage; touch coverage/coverage.html; rm coverage/coverage.html; lab -c -r html lib/ > coverage/coverage.html; open -a 'Google Chrome' coverage/coverage.html"
   },
   "repository": {
@@ -32,6 +32,7 @@
     "babel-preset-es2015": "^6.3.13",
     "code": "^2.1.0",
     "lab": "^8.0.1",
+    "sinon": "^1.17.2",
     "standard": "^5.4.1"
   },
   "dependencies": {
@@ -40,11 +41,9 @@
     "cli-table": "^0.3.1",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
-    "flat": "^1.6.0",
     "keypather": "^1.10.1",
     "keypress": "^0.2.1",
     "moment": "^2.11.0",
-    "multiline": "^1.0.2",
     "primus": "^4.0.4",
     "qs": "^6.0.1",
     "request": "^2.67.0",

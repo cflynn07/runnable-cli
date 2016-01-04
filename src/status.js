@@ -3,12 +3,11 @@
  * @exports {Function}
  */
 
-var Table = require('cli-table')
+require('colors')
 
-var flat = require('flat')
+var Table = require('cli-table')
+var keypather = require('keypather')()
 var moment = require('moment')
-var multiline = require('multiline')
-var templateString = require('template-string')
 
 /**
  * Produce template string of instance information and output to stdout
@@ -23,27 +22,35 @@ module.exports = (options, instance) => {
     style: { 'padding-left': 0, 'padding-right': 0 }
   }
   var table = new Table(tableOpts)
-  table.push(['branch name', instance.contextVersion.appCodeVersions[0].branch])
-  table.push(['cid', instance.container.dockerContainer])
-  table.push(['created by', instance.createdBy.username])
-  table.push(['github commit', instance.contextVersion.appCodeVersions[0].commit])
-  table.push(['open ports', Object.keys(instance.container.ports).join(', ')])
-  table.push(['status', instance.container.inspect.State.Status])
-  table.push(['uptime', moment.duration(instance.container.inspect.State.StartedAt).humanize()])
+  table.push(['branch name',
+             keypather.get(instance, 'contextVersion.appCodeVersions[0].branch')]);
+  table.push(['cid',
+             keypather.get(instance, 'container.dockerContainer')]);
+  table.push(['created by',
+             keypather.get(instance, 'createdBy.username')]);
+  table.push(['github commit',
+             keypather.get(instance, 'contextVersion.appCodeVersions[0].commit')]);
+  table.push(['open ports',
+             Object.keys(keypather.get(instance, 'container.ports') || {}).join(', ')]);
+  table.push(['status',
+             keypather.get(instance, 'container.inspect.State.Status')]);
+  table.push(['uptime',
+             moment.duration(keypather.get(instance, 'container.inspect.State.StartedAt'))
+             .humanize()]);
   table.map(function (arr) {
     arr[0] = arr[0].magenta
   })
   console.log([
     'https://runnable.io/',
-    instance.owner.username,
+    keypather.get(instance, 'owner.username'),
     '/',
-    instance.lowerName].join('').magenta)
+    keypather.get(instance, 'lowerName')].join('').magenta)
   console.log(table.toString())
 
   if (options.E) {
     // Add ENV VARS to status output
     table = new Table(tableOpts)
-    instance.env.forEach(function (env) {
+    keypather.get(instance, 'env').forEach(function (env) {
       table.push(env.split('='))
     })
     table.map(function (arr) {

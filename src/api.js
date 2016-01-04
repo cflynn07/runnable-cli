@@ -95,22 +95,10 @@ class API {
    *
    */
   rebuildInstance () {
-    /**
-     * 1. Copy the build
-     * 2. Build the new build you just copied
-     * 3. Slap that build on the instance
-     */
-
-    // POST https://api.runnable.io/builds/5689bfbb5f01cc1e00e45b52/actions/copy?deep=true
-    // POST https://api.runnable.io/builds/5689bfc65f01cc1e00e45b62/actions/build
-      // - message: "manual build"
-      // - noCache: true
-    // PATCH https://api.runnable.io/instances/56871492773c121e0088c163
-      // - build: "5689bfc65f01cc1e00e45b62"
-
     var _instance;
     return this.fetchInstance()
       .then((instance) => {
+        // Perform a deep copy of the build
         _instance = instance
         var buildId = instance.build.id
         return this._request({
@@ -122,7 +110,7 @@ class API {
         })
       })
       .then((response) => {
-        // build this build
+        // build the copied build
         return this._request({
           method: 'POST',
           url: ['/builds/', response.body.id, '/actions/build'].join(''),
@@ -133,6 +121,7 @@ class API {
         })
       })
       .then((response) => {
+        // Update instance with the new build
         return this._request({
           method: 'PATCH',
           url: ['/instances/', _instance.id].join(''),
