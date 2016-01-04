@@ -8,8 +8,6 @@ CLI to interact conveniently with Runnable from your development environment.
 Overview
 --------
 ```sh
-/w/runnable-cli git:master ❯❯❯ runnable                                                                   ✱ ◼
-
   Usage: runnable [options] [command]
 
 
