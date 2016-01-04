@@ -24,27 +24,27 @@ class CLI {
     program.version(packageJSON.version)
 
     program
-      .command('logs')
+      .command('logs', 'Tail the stdout of a Runnable server')
       .action(this._cmdLogs)
 
     program
-      .command('terminal')
-      .action(this._cmdTerminal)
+    .command('ssh', 'Open a remote terminal session in a Runnable server')
+      .action(this._cmdSSH)
 
     program
-      .command('start')
+    .command('start', 'Start a Runnable server')
       .action(this._cmdStart)
 
     program
-      .command('stop')
+      .command('stop', 'Stop a Runnable server')
       .action(this._cmdStop)
 
     program
-      .command('restart')
+      .command('restart', 'Restart a Runnable server')
       .action(this._cmdRestart)
 
     program
-      .command('rebuild')
+      .command('rebuild', 'Rebuild a Runnable server')
       .action(this._cmdRebuild)
 
     program
@@ -52,13 +52,12 @@ class CLI {
       .action(this._cmdList)
 
     program
-      .command('status')
-      .option('-e', 'Show environment variables')
-      .description('description foo here')
+      .command('status', 'Show a Runnable server status')
+      .option('-e', 'Show the Runnable server environment variables')
       .action(this._cmdStatus)
 
     program
-      .command('browse [target]')
+      .command('browse [target]', 'Open a Runnable page in the default browser')
       .action(this._cmdBrowse)
 
     program
@@ -91,7 +90,7 @@ class CLI {
   /**
    *
    */
-  _cmdTerminal () {
+  _cmdSSH () {
     api.fetchInstance()
       .then((instance) => {
         var terminal = new Terminal(instance.container.dockerHost,
