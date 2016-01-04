@@ -4,7 +4,6 @@
  */
 'use strict'
 
-var Promise = require('bluebird')
 var keypress = require('keypress')
 var keypather = require('keypather')()
 var uuid = require('uuid')
@@ -38,7 +37,6 @@ class Terminal {
     keypress(process.stdin)
 
     process.stdin.on('keypress', (ch, key) => {
-      //console.log(key)
       var data = ''
       if (key && key.sequence) {
         data = key.sequence
@@ -73,3 +71,4 @@ class Terminal {
 }
 
 module.exports = Terminal
+

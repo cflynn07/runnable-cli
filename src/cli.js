@@ -9,18 +9,17 @@
 // Mutates String.prototype globally, only require once in init module
 require('colors')
 
-var fs = require('fs')
 var program = require('commander')
 
 var ContainerLogs = require('./container-logs')
 var Terminal = require('./terminal')
 var api = require('./api')
+var packageJSON = require('../package.json')
 var status = require('./status')
 
 class CLI {
   constructor () {
-    //var packageJSON = JSON.parse(fs.readFileSync('../package.json'))
-    //program.version(packageJSON.version)
+    program.version(packageJSON.version)
 
     program
       .command('logs')
@@ -76,9 +75,6 @@ class CLI {
    * Attempts to determine which container to use from the origin remote of the current git repo
    */
   _cmdLogs () {
-    // Fetch instance from API
-    // codenow: 
-    // Ex: http://api.runnable.io/instances/?githubUsername=codenow&name=api
     api.fetchInstance() // TODO: Add org and name args here for manual specification
       .then((instance) => {
         var containerLogs = new ContainerLogs(instance.container.dockerHost,
@@ -87,7 +83,7 @@ class CLI {
       })
       .catch((err) => {
         console.log(err.message)
-      });
+      })
   }
 
   /**

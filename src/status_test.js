@@ -4,10 +4,8 @@
 
 require('colors')
 
-var Code = require('code')
 var Lab = require('lab')
 var clone = require('101/clone')
-var fs = require('fs')
 var moment = require('moment')
 var sinon = require('sinon')
 
@@ -43,7 +41,7 @@ describe('lib/status.js', () => {
                             'https://runnable.io/CodeNow/websocket-logic-logs-api'.magenta)
     sinon.assert.calledWith(console.log.secondCall, sinon.match.string)
     done()
-  });
+  })
 
   it('should output formatted table from instance object if no ports specified', (done) => {
     var i2 = clone(instanceMock)

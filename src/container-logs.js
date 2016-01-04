@@ -4,8 +4,6 @@
  */
 'use strict'
 
-var Promise = require('bluebird')
-
 var socket = require('./socket')
 
 class ContainerLogs {
@@ -25,7 +23,7 @@ class ContainerLogs {
    */
   fetchAndPipeToStdout () {
     this._client.on('data', (data) => {
-      if (!data.args) { return; }
+      if (!data.args) { return }
       process.stdout.write(this._convertHexToASCII(data.args))
     })
     this._client.write({
@@ -47,7 +45,7 @@ class ContainerLogs {
   _convertHexToASCII (hexString) {
     hexString = hexString.toString()
     var str = ''
-    for(var i = 0, len = hexString.length; i < len; i += 2) {
+    for (var i = 0, len = hexString.length; i < len; i += 2) {
       str += String.fromCharCode(parseInt(hexString.substr(i, 2), 16))
     }
     return str

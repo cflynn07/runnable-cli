@@ -15,28 +15,41 @@ var moment = require('moment')
  */
 module.exports = (options, instance) => {
   var tableOpts = {
-    chars: { 'top': '-' , 'top-mid': '' , 'top-left': '' , 'top-right': ''
-             , 'bottom': '-' , 'bottom-mid': '' , 'bottom-left': '' , 'bottom-right': ''
-             , 'left': '' , 'left-mid': '' , 'mid': '' , 'mid-mid': ''
-             , 'right': '' , 'right-mid': '' , 'middle': ' | ' },
+    chars: {
+      'top': '-',
+      'top-mid': '',
+      'top-left': '',
+      'top-right': '',
+      'bottom': '-',
+      'bottom-mid': '',
+      'bottom-left': '',
+      'bottom-right': '',
+      'left': '',
+      'left-mid': '',
+      'mid': '',
+      'mid-mid': '',
+      'right': '',
+      'right-mid': '',
+      'middle': ' | '
+    },
     style: { 'padding-left': 0, 'padding-right': 0 }
   }
   var table = new Table(tableOpts)
   table.push(['branch name',
-             keypather.get(instance, 'contextVersion.appCodeVersions[0].branch')]);
+             keypather.get(instance, 'contextVersion.appCodeVersions[0].branch')])
   table.push(['cid',
-             keypather.get(instance, 'container.dockerContainer')]);
+             keypather.get(instance, 'container.dockerContainer')])
   table.push(['created by',
-             keypather.get(instance, 'createdBy.username')]);
+             keypather.get(instance, 'createdBy.username')])
   table.push(['github commit',
-             keypather.get(instance, 'contextVersion.appCodeVersions[0].commit')]);
+             keypather.get(instance, 'contextVersion.appCodeVersions[0].commit')])
   table.push(['open ports',
-             Object.keys(keypather.get(instance, 'container.ports') || {}).join(', ')]);
+             Object.keys(keypather.get(instance, 'container.ports') || {}).join(', ')])
   table.push(['status',
-             keypather.get(instance, 'container.inspect.State.Status')]);
+             keypather.get(instance, 'container.inspect.State.Status')])
   table.push(['uptime',
              moment.duration(keypather.get(instance, 'container.inspect.State.StartedAt'))
-             .humanize()]);
+             .humanize()])
   table.map(function (arr) {
     arr[0] = arr[0].magenta
   })
