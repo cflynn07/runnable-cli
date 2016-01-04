@@ -37,8 +37,8 @@ class API {
         return this._request({
           url: '/instances',
           qs: {
-            githubUsername: repoData.orgName,
-            name: instanceName
+            githubUsername: repoData.orgName.toLowerCase(),
+            name: instanceName.toLowerCase()
           }
         })
         .then((response) => {
