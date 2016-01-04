@@ -1,9 +1,10 @@
 <img src="https://runnable.io/build/images/runnabear-head.png" width="150"> Runnable CLI (PRE-RELEASE ALPHA)
 ==========
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 The Runnable CLI is an interface to the Runnable Platform API. Supported features include log
 tailing, terminal sessions, starting/stopping/restarting Servers, status inspection, etc. Use the
-CLI to interact conveniently with Runnable from your development environment.
+CLI to conveniently interact with Runnable from your development environment.
 
 Overview
 --------
