@@ -28,7 +28,7 @@ class CLI {
       .action(this._cmdLogs)
 
     program
-    .command('ssh', 'Open a remote terminal session in a Runnable server')
+      .command('ssh', 'Open a remote terminal session in a Runnable server')
       .action(this._cmdSSH)
 
     program
@@ -72,8 +72,7 @@ class CLI {
   }
 
   /**
-   * Tail the CMD logs of a container on Runnable.
-   * Attempts to determine which container to use from the origin remote of the current git repo
+   * Tail the stdout of a Runnable server.
    */
   _cmdLogs () {
     api.fetchInstance() // TODO: Add org and name args here for manual specification
@@ -88,7 +87,7 @@ class CLI {
   }
 
   /**
-   *
+   * Open a remote terminal session in a Runnable server
    */
   _cmdSSH () {
     api.fetchInstance()
@@ -103,7 +102,7 @@ class CLI {
   }
 
   /**
-   *
+   * Start a Runnable server
    */
   _cmdStart () {
     api.startInstance()
@@ -120,7 +119,7 @@ class CLI {
   }
 
   /**
-   *
+   * Stop a Runnable server
    */
   _cmdStop () {
     api.stopInstance()
@@ -137,7 +136,7 @@ class CLI {
   }
 
   /**
-   *
+   * Restart a Runnable server
    */
   _cmdRestart () {
     api.restartInstance()
@@ -154,7 +153,7 @@ class CLI {
   }
 
   /**
-   *
+   * Rebuild a Runnable server
    */
   _cmdRebuild () {
     api.rebuildInstance()
@@ -171,21 +170,22 @@ class CLI {
   }
 
   /**
-   *
+   * 
    */
   _cmdList () {
   }
 
   /**
-   * Testing this feature for now, not final implementation
+   * Open a Runnable page in the default browser
+   * @param {String} target - Optional, [Runnable, Server]
    */
   _cmdBrowse (target) {
-    console.log('Opening...'.magenta)
+    console.log('Opening a Runnable page in the default browser...'.magenta)
     api.fetchInstance()
       .then((instance) => {
-        if (!target || target === 'runnable') {
+        if (!target || target.toLowerCase() === 'runnable') {
           open('https://runnable.io/' + instance.owner.username + '/' + instance.lowerName)
-        } else if (target === 'container') {
+        } else if (target.toLowerCase() === 'server') {
           var url = 'http://' + instance.shortHash +
             '-' + instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1] +
             '-staging-' +
@@ -200,7 +200,7 @@ class CLI {
   }
 
   /**
-   *
+   * Show a Runnable server status
    */
   _cmdStatus (options) {
     api.fetchInstance()
