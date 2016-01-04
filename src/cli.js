@@ -66,7 +66,7 @@ class CLI {
       .action(this._cmdStatus)
 
     program
-      .command('browse [target]')
+      .command('browse [runnable | server]')
       .description('Open a Runnable page in the default browser')
       .action(this._cmdBrowse)
 
