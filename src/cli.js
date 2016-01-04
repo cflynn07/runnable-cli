@@ -9,9 +9,11 @@
 // Mutates String.prototype globally, only require once in init module
 require('colors')
 
+var open = require('open')
 var program = require('commander')
 
 var ContainerLogs = require('./container-logs')
+var Git = require('./git')
 var Terminal = require('./terminal')
 var api = require('./api')
 var packageJSON = require('../package.json')
@@ -56,7 +58,7 @@ class CLI {
       .action(this._cmdStatus)
 
     program
-      .command('browse')
+      .command('browse [target]')
       .action(this._cmdBrowse)
 
     program
@@ -176,9 +178,26 @@ class CLI {
   }
 
   /**
-   *
+   * Testing this feature for now, not final implementation
    */
-  _cmdBrowse () {
+  _cmdBrowse (target) {
+    console.log('Opening...'.magenta)
+    api.fetchInstance()
+      .then((instance) => {
+        if (!target || target === 'runnable') {
+          open('https://runnable.io/' + instance.owner.username + '/' + instance.lowerName)
+        } else if (target === 'container') {
+          var url = 'http://' + instance.shortHash +
+            '-' + instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1] +
+            '-staging-' +
+            instance.owner.username + '.runnableapp.com'
+          console.log(url)
+          open(url)
+        }
+      })
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
   }
 
   /**
