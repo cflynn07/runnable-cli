@@ -154,13 +154,23 @@ class CLI {
       .catch((err) => {
         console.log(err.message, err.stack)
       })
-
   }
 
   /**
    *
    */
   _cmdRebuild () {
+    api.rebuildInstance()
+      .then((response) => {
+        var output = ['https://runnable.io',
+          response.body.owner.username,
+          response.body.lowerName].join('/') + '\n'
+        output += 'Rebuilding container...'
+        console.log(output.magenta)
+      })
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
   }
 
   /**
