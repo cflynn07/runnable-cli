@@ -6,6 +6,9 @@
  */
 'use strict'
 
+// Mutates String.prototype globally, only require once in init module
+require('colors')
+
 var fs = require('fs')
 var program = require('commander')
 
@@ -76,7 +79,7 @@ class CLI {
     // Fetch instance from API
     // codenow: 
     // Ex: http://api.runnable.io/instances/?githubUsername=codenow&name=api
-    api.fetchInstanceInfo() // TODO: Add org and name args here for manual specification
+    api.fetchInstance() // TODO: Add org and name args here for manual specification
       .then((instance) => {
         var containerLogs = new ContainerLogs(instance.container.dockerHost,
                                               instance.container.dockerContainer)
@@ -91,7 +94,7 @@ class CLI {
    *
    */
   _cmdTerminal () {
-    api.fetchInstanceInfo()
+    api.fetchInstance()
       .then((instance) => {
         var terminal = new Terminal(instance.container.dockerHost,
                                     instance.container.dockerContainer)
@@ -106,6 +109,17 @@ class CLI {
    *
    */
   _cmdStart () {
+    api.startInstance()
+      .then((response) => {
+        var output = ['https://runnable.io',
+          response.body.owner.username,
+          response.body.lowerName].join('/') + '\n'
+        output += 'Starting your container...'
+        console.log(output.magenta)
+      })
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
   }
 
   /**
@@ -143,7 +157,7 @@ class CLI {
    *   - env
    */
   _cmdStatus (options) {
-    api.fetchInstanceInfo()
+    api.fetchInstance()
       .then(status.bind(this, options))
       .catch((err) => {
         console.log(err.message, err.stack)

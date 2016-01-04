@@ -31,18 +31,11 @@ class API {
    *   - dockHost
    *   - containerId
    */
-  fetchInstanceInfo () {
+  fetchInstance () {
     var git = new Git()
     return git.fetchRepositoryInfo()
       .then((repoData) => {
         var instanceName = this._computeInstanceName(repoData.branch, repoData.repoName)
-
-        /**
-         * TEMP
-         */
-        repoData.orgName = 'codenow'
-        instanceName = 'api'
-
         return this._request({
           url: '/instances',
           qs: {
@@ -55,6 +48,19 @@ class API {
             throw new Error('Instance not found')
           }
           return response.body[0]
+        })
+      })
+  }
+
+  /**
+   *
+   */
+  startInstance () {
+    return this.fetchInstance()
+      .then((instance) => {
+        return this._request({
+          method: 'PUT',
+          url: ['/instances/', instance.id, '/actions/start'].join('')
         })
       })
   }
