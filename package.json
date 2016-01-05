@@ -54,7 +54,7 @@
     "qs": "^6.0.1",
     "request": "^2.67.0",
     "seamless-immutable": "^4.1.1",
-    "simple-git": "^1.18.0",
+    "simple-git": "git://github.com/CFlynn07/git-js.git#97ba9d585be78e370311a33c1dd27b6fe09cb9d1",
     "substream": "^0.2.0",
     "template-string": "^1.1.0",
     "uuid": "^2.0.1",
