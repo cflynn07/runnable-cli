@@ -4,8 +4,10 @@
  */
 'use strict'
 
-var Immutable = require('immutable')
+var Immutable = require('seamless-immutable')
 var Promise = require('bluebird')
+var compose = require('101/compose')
+var pluck = require('101/pluck')
 var request = require('request')
 
 var Git = require('./git')
@@ -27,9 +29,7 @@ class API {
   /**
    * Fetch an instance object from API
    * @returns Promise - resolves:
-   *   Object: <immutable>
-   *     - dockHost
-   *     - containerId
+   *   Immutable<Map>
    */
   fetchInstance () {
     var git = new Git()
@@ -49,17 +49,15 @@ class API {
             throw new Error('Instance not found: ' +
                             repoData.orgName.toLowerCase() + '/' + instanceName.toLowerCase())
           }
-          return reponse.body[0]
-          // return Immutable.Map(response.body[0])
-        })
+          return response
+        }).then(compose(Immutable, pluck('body[0]')))
       })
   }
 
   /**
    * Fetch collection of instances from API
    * @return Promise - resolves:
-   *   Array:
-   *     Object<instance>
+   *   Immutable<Set>
    */
   fetchInstances () {
     var git = new Git()
@@ -71,13 +69,7 @@ class API {
             githubUsername: repoData.orgName.toLowerCase(),
             ignoredFields: 'contextVersions,build.log,contextVersion.build.log'
           }
-        })
-        .then((response) => {
-          if (!response.body || !response.body.length) {
-            throw new Error('Instances not found')
-          }
-          return response.body;
-        })
+        }).then(compose(Immutable, pluck('body')))
       })
   }
 
@@ -89,9 +81,9 @@ class API {
       .then((instance) => {
         return this._request({
           method: 'PUT',
-          url: ['/instances/', instance.id, '/actions/start'].join('')
+          url: ['/instances/', instance.get('id'), '/actions/start'].join('')
         })
-      })
+      }).then(compose(Immutable, pluck('body')))
   }
 
   /**
@@ -102,9 +94,9 @@ class API {
       .then((instance) => {
         return this._request({
           method: 'PUT',
-          url: ['/instances/', instance.id, '/actions/stop'].join('')
+          url: ['/instances/', instance.get('id'), '/actions/stop'].join('')
         })
-      })
+      }).then(compose(Immutable, pluck('body')))
   }
 
   /**
@@ -115,9 +107,9 @@ class API {
       .then((instance) => {
         return this._request({
           method: 'PUT',
-          url: ['/instances/', instance.id, '/actions/restart'].join('')
+          url: ['/instances/', instance.get('id'), '/actions/restart'].join('')
         })
-      })
+      }).then(compose(Immutable, pluck('body')))
   }
 
   /**
@@ -129,35 +121,40 @@ class API {
       .then((instance) => {
         // Perform a deep copy of the build
         _instance = instance
-        var buildId = instance.build.id
+        var buildId = instance.get('build').get('id')
         return this._request({
           method: 'POST',
           url: ['/builds/', buildId, '/actions/copy'].join(''),
           qs: {
             deep: true
           }
-        })
+        }).then(compose(Immutable, pluck('body')))
       })
-      .then((response) => {
+      .then((body) => {
         // build the copied build
         return this._request({
           method: 'POST',
-          url: ['/builds/', response.body.id, '/actions/build'].join(''),
+          url: ['/builds/', body.get('id'), '/actions/build'].join(''),
           body: {
             message: 'manual build',
             noCache: true
           }
-        })
+        }).then(compose(Immutable, pluck('body')))
       })
-      .then((response) => {
+      .then((body) => {
         // Update instance with the new build
         return this._request({
           method: 'PATCH',
-          url: ['/instances/', _instance.id].join(''),
+          url: ['/instances/', _instance.get('id')].join(''),
           body: {
-            build: response.body.id
+            build: body.get('id')
           }
-        })
+        }).then((response) => {
+          if (response.body.statusCode > 300) {
+            throw new Error(response.body)
+          }
+          return response
+        }).then(compose(Immutable, pluck('body')))
       })
   }
 

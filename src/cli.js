@@ -15,6 +15,7 @@ var ContainerLogs = require('./container-logs')
 var Git = require('./git')
 var Terminal = require('./terminal')
 var api = require('./api')
+var list = require('./list')
 var packageJSON = require('../package.json')
 var status = require('./status')
 
@@ -57,6 +58,7 @@ class CLI {
 
     program
       .command('list')
+      .description('Fetch a list of Runnable servers')
       .action(this._cmdList)
 
     program
@@ -116,10 +118,10 @@ class CLI {
    */
   _cmdStart () {
     api.startInstance()
-      .then((response) => {
+      .then((instance) => {
         var output = ['https://runnable.io',
-          response.body.owner.username,
-          response.body.lowerName].join('/') + '\n'
+          instance.owner.username,
+          instance.lowerName].join('/') + '\n'
         output += 'Starting container...'
         console.log(output.magenta)
       })
@@ -133,10 +135,10 @@ class CLI {
    */
   _cmdStop () {
     api.stopInstance()
-      .then((response) => {
+      .then((instance) => {
         var output = ['https://runnable.io',
-          response.body.owner.username,
-          response.body.lowerName].join('/') + '\n'
+          instance.owner.username,
+          instance.lowerName].join('/') + '\n'
         output += 'Stopping container...'
         console.log(output.magenta)
       })
@@ -150,10 +152,10 @@ class CLI {
    */
   _cmdRestart () {
     api.restartInstance()
-      .then((response) => {
+      .then((instance) => {
         var output = ['https://runnable.io',
-          response.body.owner.username,
-          response.body.lowerName].join('/') + '\n'
+          instance.owner.username,
+          instance.lowerName].join('/') + '\n'
         output += 'Restarting container...'
         console.log(output.magenta)
       })
@@ -167,10 +169,10 @@ class CLI {
    */
   _cmdRebuild () {
     api.rebuildInstance()
-      .then((response) => {
+      .then((instance) => {
         var output = ['https://runnable.io',
-          response.body.owner.username,
-          response.body.lowerName].join('/') + '\n'
+          instance.owner.username,
+          instance.lowerName].join('/') + '\n'
         output += 'Rebuilding container...'
         console.log(output.magenta)
       })
@@ -180,9 +182,14 @@ class CLI {
   }
 
   /**
-   * 
+   * Fetch a list of Runnable servers
    */
-  _cmdList () {
+  _cmdList (options) {
+    api.fetchInstances()
+      .then(list.bind(list, options))
+      .catch((err) => {
+        console.log(err.message, err.stack)
+      })
   }
 
   /**
