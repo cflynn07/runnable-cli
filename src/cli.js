@@ -8,6 +8,7 @@
 
 require('colors')
 
+var Spinner = require('cli-spinner').Spinner
 var open = require('open')
 var program = require('commander')
 
@@ -19,12 +20,17 @@ var list = require('./list')
 var packageJSON = require('../package.json')
 var status = require('./status')
 
+var cli;
+
 /**
  * Main CLI class. The constructor function is the program entry point.
  */
 class CLI {
   constructor () {
     program.version(packageJSON.version)
+
+    Spinner.setDefaultSpinnerString(Spinner.spinners[9])
+    this._spinner = new Spinner('%s '.magenta)
 
     program
       .command('logs')
@@ -59,18 +65,18 @@ class CLI {
     program
       .command('list')
       .description('Fetch a list of Runnable servers')
-      .action(this._cmdList)
+      .action(this._cmdList.bind(this))
 
     program
       .command('status')
       .description('Show a Runnable server status')
       .option('-e', 'Show the Runnable server environment variables')
-      .action(this._cmdStatus)
+      .action(this._cmdStatus.bind(this))
 
     program
       .command('browse [runnable | server]')
       .description('Open a Runnable page in the default browser')
-      .action(this._cmdBrowse)
+      .action(this._cmdBrowse.bind(this))
 
     program
       .command('*')
@@ -185,9 +191,15 @@ class CLI {
    * Fetch a list of Runnable servers
    */
   _cmdList (options) {
+    this._spinner.start()
     api.fetchInstances()
+      .then((instances) => {
+        this._spinner.stop(true)
+        return instances
+      })
       .then(list.bind(list, options))
       .catch((err) => {
+        this._spinner.stop(true)
         console.log(err.message, err.stack)
       })
   }
@@ -197,9 +209,12 @@ class CLI {
    * @param {String} target - Optional, [Runnable, Server]
    */
   _cmdBrowse (target) {
-    console.log('Opening a Runnable page in the default browser...'.magenta)
+    // console.log('Opening a Runnable page in the default browser...'.magenta)
+    // TODO handle ports
+    this._spinner.start()
     api.fetchInstance()
       .then((instance) => {
+        this._spinner.stop(true)
         if (!target || target.toLowerCase() === 'runnable') {
           open('https://runnable.io/' + instance.owner.username + '/' + instance.lowerName)
         } else if (target.toLowerCase() === 'server') {
@@ -212,6 +227,7 @@ class CLI {
         }
       })
       .catch((err) => {
+        this._spinner.stop(true)
         console.log(err.message, err.stack)
       })
   }
@@ -220,9 +236,15 @@ class CLI {
    * Show a Runnable server status
    */
   _cmdStatus (options) {
+    this._spinner.start()
     api.fetchInstance()
+      .then((instance) => {
+        this._spinner.stop(true)
+        return instance
+      })
       .then(status.bind(this, options))
       .catch((err) => {
+        this._spinner.stop(true)
         console.log(err.message, err.stack)
       })
   }
