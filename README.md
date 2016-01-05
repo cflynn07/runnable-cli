@@ -131,7 +131,7 @@ NEO4J                           | http://neo4j-staging-codenow.runnableapp.com:7
 RABBITMQ_HOSTNAME               | ##############
 RABBITMQ_PORT                   | ##############
 RABBITMQ_USERNAME               | ################################################
-RABBITMQ_PASSWORD               | h###############################################
+RABBITMQ_PASSWORD               | ################################################
 DATADOG_HOST                    | datadog-staging-codenow.runnableapp.com
 MAVIS_HOST                      | http://mavis-staging-codenow.runnableapp.com
 MONGO                           | mongodb://mongodb-staging-codenow.runnableapp.com/alpha
