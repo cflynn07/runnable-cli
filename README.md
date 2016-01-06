@@ -87,55 +87,7 @@ Rebuilding container...
 ```
 
 ### runnable list
-```sh
-/w/api git:master ❯❯❯ runnable list                                                                                                                                                                                                                                                                                        ✱
-------------------------------------------------------------------------------------------
-CodeNow/api              | check-for-deleted-flag                                    | exited
-CodeNow/api              | new-test-branch                                           | exited
-CodeNow/api              | SAN-2855-container-create-worker-handle-pull-failures-api | running
-CodeNow/api              | SAN-3159-redeploy-if-staring-migrated-instance            | running
-CodeNow/api              | SAN-2855-container-create-worker-handle-pull-failures     | -
-CodeNow/api              | anton-test                                                | -
-CodeNow/api              | SAN-3085-speed-testing                                    | created
-CodeNow/api              | SAN-3265-upgrade-on-image-builder-container-create        | running
-CodeNow/api              | SAN-2844-replace-auto-fork-deep-copy-again                | running
-CodeNow/api              | master                                                    | running
-CodeNow/api              | SAN-3170-logging                                          | exited
-CodeNow/api              | websocket-logic-logs                                      | running
-CodeNow/api              | master                                                    | running
-CodeNow/api              | SAN-3077-restore-newrelic-again                           | running
-CodeNow/api              | instance-delete-rollbar                                   | running
-CodeNow/api              | SAN-1898-CSRF                                             | running
-CodeNow/api              | WORKER-do-not-delete                                      | running
-CodeNow/astral           | master                                                    | running
-CodeNow/astral           | add-staging                                               | exited
-CodeNow/datadog          | master                                                    | running
-CodeNow/hellonode        | master                                                    | running
-CodeNow/hellonode        | ant1                                                      | running
-CodeNow/mavis            | master                                                    | running
-CodeNow/navi             | SAN-2087-script-inject                                    | -
-CodeNow/neo4j            | master                                                    | running
-CodeNow/optimus          | master                                                    | running
-CodeNow/pd-php-test      | test2                                                     | -
-CodeNow/pd-php-test      | ghgh                                                      | -
-CodeNow/runnable-angular | SAN-3075-connections                                      | running
-CodeNow/runnable-angular | anand                                                     | running
-CodeNow/runnable-angular | SAN-3056-container-url-fix                                | running
-CodeNow/runnable-angular | SAN-3125-add-invite-link-in-commit-view                   | running
-CodeNow/runnable-angular | SAN-3100-new-server-modal-button-directive                | running
-CodeNow/runnable-angular | anton2                                                    | running
-CodeNow/runnable-angular | add-caching-to-services                                   | running
-CodeNow/runnable-angular | SAN-3192-ip-whitelisting                                  | running
-CodeNow/runnable-angular | add-services-for-invitations-and-fetching-user-commits    | running
-CodeNow/runnable-angular | SAN-3209-getting-started-modal                            | running
-CodeNow/runnable-angular | master                                                    | running
-CodeNow/runnable-angular | ASAP-card-status-popover-fails-to-open                    | running
-CodeNow/sauron           | master                                                    | -
-CodeNow/styleguide       | master                                                    | running
-CodeNow/swarm            | master                                                    | running
--                        | -                                                         | running
-------------------------------------------------------------------------------------------
-```
+![](https://cloud.githubusercontent.com/assets/467885/12137056/120b4f64-b402-11e5-9736-e10efc389dc0.png)
 
 ### runnable status
 ```sh
