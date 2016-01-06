@@ -18,6 +18,12 @@ var output = require('./output')
  */
 var list = module.exports = (options, instances) => {
   var tableOpts = {
+    head: [
+      'REPO',
+      'BRANCH',
+      'STATUS',
+      'OWNER'
+    ].map((s) => { return s.white.bold }),
     chars: {
       'top': '-',
       'top-mid': '',
@@ -51,7 +57,8 @@ var list = module.exports = (options, instances) => {
     table.push([
       propFetch('contextVersion.appCodeVersions[0].repo'),
       propFetch('contextVersion.appCodeVersions[0].branch'),
-      propFetch('container.inspect.State.Status')
+      propFetch('container.inspect.State.Status'),
+      propFetch('createdBy.username')
     ])
   })
 
@@ -97,6 +104,8 @@ module.exports._sortInstances = (instances) => {
   instances.forEach(binarySearchInsert.bind(this, sortedInstances, comparator))
   return sortedInstances
 }
+
+
 
 /**
  * Temporary

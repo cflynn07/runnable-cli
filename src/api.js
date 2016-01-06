@@ -12,6 +12,7 @@ var request = require('request')
 
 var Git = require('./git')
 var output = require('./output')
+var packageJSON = require('../package.json')
 
 class API {
   constructor () {
@@ -19,8 +20,13 @@ class API {
     this._jar.setCookie(process.env.RUNNABLE_COOKIE, process.env.RUNNABLE_API_HOST)
     this._request = request.defaults({
       baseUrl: process.env.RUNNABLE_API_HOST,
+      headers: {
+        'User-Agent': ['Runnable CLI',  packageJSON.version].join(' ')
+      },
       jar: this._jar,
-      json: true
+      json: true,
+      rejectUnauthorized: false,
+      strictSSL: false
     })
     this._request = Promise.promisify(this._request)
     Promise.promisifyAll(this._request)
