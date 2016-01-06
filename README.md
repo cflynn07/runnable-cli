@@ -153,6 +153,15 @@ TEST_NEO4J                      | true
 -------------------------------------------------------------------------------------------------
 ```
 
+### runnable browse
+##### Auto open urls in the default browser
+```sh
+/w/api git:master ❯❯❯ runnable browse                            ✱
+https://runnable.io/CodeNow/api
+/w/api git:master ❯❯❯ runnable browse server                     ✱
+http://e4rov2-api-staging-CodeNow.runnableapp.com
+```
+
 ### runnable watch
 ```
 ```
