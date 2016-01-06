@@ -163,8 +163,7 @@ http://e4rov2-api-staging-CodeNow.runnableapp.com
 ```
 
 ### runnable watch
-```
-```
+![runnable_cli_ssh](https://cloud.githubusercontent.com/assets/467885/12136801/1d79489e-b400-11e5-9fdd-3df1ca8a7f3b.png)
 
 Issues
 ------
