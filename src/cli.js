@@ -8,7 +8,6 @@
 
 require('colors')
 
-var Spinner = require('cli-spinner').Spinner
 var open = require('open')
 var program = require('commander')
 
@@ -18,6 +17,7 @@ var Terminal = require('./terminal')
 var Watcher = require('./watcher')
 var api = require('./api')
 var list = require('./list')
+var output = require('./output')
 var packageJSON = require('../package.json')
 var status = require('./status')
 
@@ -27,9 +27,6 @@ var status = require('./status')
 class CLI {
   constructor () {
     program.version(packageJSON.version)
-
-    Spinner.setDefaultSpinnerString(Spinner.spinners[9])
-    this._spinner = new Spinner('%s '.magenta)
 
     program
       .command('logs')
@@ -195,17 +192,14 @@ class CLI {
    * Fetch a list of Runnable servers
    */
   _cmdList (options) {
-    this._spinner.start()
+    var stopSpinner = output()
     api.fetchInstances()
-      .then((instances) => {
-        this._spinner.stop(true)
-        return instances
-      })
+      .then(stopSpinner)
       .then(list.bind(list, options))
       .catch((err) => {
-        this._spinner.stop(true)
         console.log(err.message, err.stack)
       })
+      .finally(stopSpinner)
   }
 
   /**
@@ -215,10 +209,10 @@ class CLI {
   _cmdBrowse (target) {
     // console.log('Opening a Runnable page in the default browser...'.magenta)
     // TODO handle ports
-    this._spinner.start()
+    var stopSpinner = output()
     api.fetchInstance()
+      .then(stopSpinner)
       .then((instance) => {
-        this._spinner.stop(true)
         if (!target || target.toLowerCase() === 'runnable') {
           open('https://runnable.io/' + instance.owner.username + '/' + instance.lowerName)
         } else if (target.toLowerCase() === 'server') {
@@ -231,36 +225,33 @@ class CLI {
         }
       })
       .catch((err) => {
-        this._spinner.stop(true)
         console.log(err.message, err.stack)
       })
+      .finally(stopSpinner)
   }
 
   /**
    * Show a Runnable server status
    */
   _cmdStatus (options) {
-    this._spinner.start()
+    var stopSpinner = output()
     api.fetchInstance()
-      .then((instance) => {
-        this._spinner.stop(true)
-        return instance
-      })
+      .then(stopSpinner)
       .then(status.bind(this, options))
       .catch((err) => {
-        this._spinner.stop(true)
         console.log(err.message, err.stack)
       })
+      .finally(stopSpinner)
   }
 
   /**
    * Watch a repository and automatically upload changed files to a Runnable server
    */
   _cmdWatch () {
-    this._spinner.start()
+    var stopSpinner = output()
     api.fetchInstance()
+      .then(stopSpinner)
       .then((instance) => {
-        this._spinner.stop(true)
         var watcher = new Watcher(instance)
         watcher.watch()
       })
