@@ -14,11 +14,10 @@ var Git = require('./git')
 
 class API {
   constructor () {
-    var apiUrl = process.env.RUNNABLE_CLI_HOST || 'https://api.runnable.io'
     this._jar = request.jar()
-    this._jar.setCookie(process.env.RUNNABLE_COOKIE, 'https://api.runnable.io')
+    this._jar.setCookie(process.env.RUNNABLE_COOKIE, process.env.RUNNABLE_API_HOST)
     this._request = request.defaults({
-      baseUrl: apiUrl,
+      baseUrl: process.env.RUNNABLE_API_HOST,
       jar: this._jar,
       json: true
     })

@@ -8,6 +8,12 @@
 
 require('colors')
 
+var defaults = require('101/defaults')
+defaults(process.env, {
+  RUNNABLE_API_HOST: 'https://api.runnable.io',
+  RUNNABLE_HOST: 'https://runnable.io'
+})
+
 var open = require('open')
 var program = require('commander')
 
