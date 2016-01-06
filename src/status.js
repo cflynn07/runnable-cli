@@ -1,16 +1,20 @@
 /**
  * @module lib/status
- * @exports {Function}
+ * @exports Function
  */
+'use strict'
 
 require('colors')
 var Table = require('cli-table')
 var keypather = require('keypather')()
 var moment = require('moment')
 
+var output = require('./output')
+
 /**
  * Create a formatted table from instance object property values. Output to stdout.
- * @param {Object} instance
+ * @param {Object} options - Options passed from commander.js/cli arguments & flags
+ * @param {Object} instance - Instance object from API
  */
 module.exports = (options, instance) => {
   var tableOpts = {
@@ -52,11 +56,8 @@ module.exports = (options, instance) => {
   table.map(function (arr) {
     arr[0] = arr[0].magenta
   })
-  console.log([
-    'https://runnable.io/',
-    keypather.get(instance, 'owner.username'),
-    '/',
-    keypather.get(instance, 'lowerName')].join('').magenta)
+
+  console.log(output.instanceWebURL(instance).magenta)
   console.log(table.toString())
 
   if (options.E) {

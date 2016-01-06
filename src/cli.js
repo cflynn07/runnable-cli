@@ -11,7 +11,8 @@ require('colors')
 var defaults = require('101/defaults')
 defaults(process.env, {
   RUNNABLE_API_HOST: 'https://api.runnable.io',
-  RUNNABLE_HOST: 'https://runnable.io'
+  RUNNABLE_WEB_HOST: 'https://runnable.io',
+  RUNNABLE_CONTAINER_TLD: '.runnableapp.com'
 })
 
 var open = require('open')
@@ -130,13 +131,11 @@ class CLI {
    * Start a Runnable server
    */
   _cmdStart () {
+    var stopSpinner = output.spinner()
     api.startInstance()
+      .then(stopSpinner)
       .then((instance) => {
-        var output = ['https://runnable.io',
-          instance.owner.username,
-          instance.lowerName].join('/') + '\n'
-        output += 'Starting container...'
-        console.log(output.magenta)
+        output.general(output.instanceWebURL(instance) + '\n' + 'Starting container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -147,13 +146,11 @@ class CLI {
    * Stop a Runnable server
    */
   _cmdStop () {
+    var stopSpinner = output.spinner()
     api.stopInstance()
+      .then(stopSpinner)
       .then((instance) => {
-        var output = ['https://runnable.io',
-          instance.owner.username,
-          instance.lowerName].join('/') + '\n'
-        output += 'Stopping container...'
-        console.log(output.magenta)
+        output.general(output.instanceWebURL(instance) + '\n' + 'Stopping container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -164,13 +161,11 @@ class CLI {
    * Restart a Runnable server
    */
   _cmdRestart () {
+    var stopSpinner = output.spinner()
     api.restartInstance()
+      .then(stopSpinner)
       .then((instance) => {
-        var output = ['https://runnable.io',
-          instance.owner.username,
-          instance.lowerName].join('/') + '\n'
-        output += 'Restarting container...'
-        console.log(output.magenta)
+        output.general(output.instanceWebURL(instance) + '\n' + 'Restarting container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -181,13 +176,11 @@ class CLI {
    * Rebuild a Runnable server
    */
   _cmdRebuild () {
+    var stopSpinner = output.spinner()
     api.rebuildInstance()
+      .then(stopSpinner)
       .then((instance) => {
-        var output = ['https://runnable.io',
-          instance.owner.username,
-          instance.lowerName].join('/') + '\n'
-        output += 'Rebuilding container...'
-        console.log(output.magenta)
+        output.general(output.instanceWebURL(instance) + '\n' + 'Rebuilding container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -198,7 +191,7 @@ class CLI {
    * Fetch a list of Runnable servers
    */
   _cmdList (options) {
-    var stopSpinner = output()
+    var stopSpinner = output.spinner()
     api.fetchInstances()
       .then(stopSpinner)
       .then(list.bind(list, options))
@@ -215,19 +208,14 @@ class CLI {
   _cmdBrowse (target) {
     // console.log('Opening a Runnable page in the default browser...'.magenta)
     // TODO handle ports
-    var stopSpinner = output()
+    var stopSpinner = output.spinner()
     api.fetchInstance()
       .then(stopSpinner)
       .then((instance) => {
         if (!target || target.toLowerCase() === 'runnable') {
-          open('https://runnable.io/' + instance.owner.username + '/' + instance.lowerName)
+          open(output.instanceWebURL(instance))
         } else if (target.toLowerCase() === 'server') {
-          var url = 'http://' + instance.shortHash +
-            '-' + instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1] +
-            '-staging-' +
-            instance.owner.username + '.runnableapp.com'
-          console.log(url)
-          open(url)
+          open(output.instanceServerURL(instance))
         }
       })
       .catch((err) => {
@@ -240,7 +228,7 @@ class CLI {
    * Show a Runnable server status
    */
   _cmdStatus (options) {
-    var stopSpinner = output()
+    var stopSpinner = output.spinner()
     api.fetchInstance()
       .then(stopSpinner)
       .then(status.bind(this, options))
@@ -254,7 +242,7 @@ class CLI {
    * Watch a repository and automatically upload changed files to a Runnable server
    */
   _cmdWatch () {
-    var stopSpinner = output()
+    var stopSpinner = output.spinner()
     api.fetchInstance()
       .then(stopSpinner)
       .then((instance) => {

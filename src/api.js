@@ -11,6 +11,7 @@ var pluck = require('101/pluck')
 var request = require('request')
 
 var Git = require('./git')
+var output = require('./output')
 
 class API {
   constructor () {
@@ -35,7 +36,7 @@ class API {
     var instanceName;
     return git.fetchRepositoryInfo()
       .then((repoData) => {
-        instanceName = this._computeInstanceName(repoData.branch, repoData.repoName)
+        instanceName = output.instanceName(repoData.branch, repoData.repoName)
         return this._request({
           url: '/instances',
           qs: {
@@ -80,7 +81,7 @@ class API {
       .then((instance) => {
         return this._request({
           method: 'PUT',
-          url: ['/instances/', instance.get('id'), '/actions/start'].join('')
+          url: ['/instances/', instance.id, '/actions/start'].join('')
         })
       }).then(compose(Immutable, pluck('body')))
   }
@@ -93,7 +94,7 @@ class API {
       .then((instance) => {
         return this._request({
           method: 'PUT',
-          url: ['/instances/', instance.get('id'), '/actions/stop'].join('')
+          url: ['/instances/', instance.id, '/actions/stop'].join('')
         })
       }).then(compose(Immutable, pluck('body')))
   }
@@ -106,7 +107,7 @@ class API {
       .then((instance) => {
         return this._request({
           method: 'PUT',
-          url: ['/instances/', instance.get('id'), '/actions/restart'].join('')
+          url: ['/instances/', instance.id, '/actions/restart'].join('')
         })
       }).then(compose(Immutable, pluck('body')))
   }
@@ -120,10 +121,9 @@ class API {
       .then((instance) => {
         // Perform a deep copy of the build
         _instance = instance
-        var buildId = instance.get('build').get('id')
         return this._request({
           method: 'POST',
-          url: ['/builds/', buildId, '/actions/copy'].join(''),
+          url: ['/builds/', instance.build.id, '/actions/copy'].join(''),
           qs: {
             deep: true
           }
@@ -133,7 +133,7 @@ class API {
         // build the copied build
         return this._request({
           method: 'POST',
-          url: ['/builds/', body.get('id'), '/actions/build'].join(''),
+          url: ['/builds/', body.id, '/actions/build'].join(''),
           body: {
             message: 'manual build',
             noCache: true
@@ -144,9 +144,9 @@ class API {
         // Update instance with the new build
         return this._request({
           method: 'PATCH',
-          url: ['/instances/', _instance.get('id')].join(''),
+          url: ['/instances/', _instance.id].join(''),
           body: {
-            build: body.get('id')
+            build: body.id
           }
         }).then((response) => {
           if (response.body.statusCode > 300) {
@@ -175,20 +175,6 @@ class API {
    *
    */
   deleteInstanceFile () {
-  }
-
-  /**
-   * Generate Runnable instance name based on name pattern
-   * @param {String} branch
-   * @param {String} repo
-   * @return String
-   */
-  _computeInstanceName (branch, repo) {
-    if (branch === 'master') {
-      return repo
-    } else {
-      return branch + '-' + repo
-    }
   }
 }
 
