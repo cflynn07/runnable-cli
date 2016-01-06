@@ -14,23 +14,22 @@ Overview
 
   Commands:
 
-    logs             Tail the stdout of a Runnable server
-    ssh              Open a remote terminal session in a Runnable server
-    start            Start a Runnable server
-    stop             Stop a Runnable server
-    restart          Restart a Runnable server
-    rebuild          Rebuild a Runnable server
-    list
-    status           Show a Runnable server status
-    browse [target]  Open a Runnable page in the default browser
+    logs               Tail the stdout of a Runnable server
+    ssh                Open a remote terminal session in a Runnable server
+    start              Start a Runnable server
+    stop               Stop a Runnable server
+    restart            Restart a Runnable server
+    rebuild            Rebuild a Runnable server
+    list               Fetch a list of Runnable servers
+    status [options]   Show a Runnable server status
+    watch              Watch a repository and automatically upload changed files to a Runnable server
+    browse [runnabl]   Open a Runnable page in the default browser
     *
-    help [cmd]       display help for [cmd]
 
   Options:
 
     -h, --help     output usage information
     -V, --version  output the version number
-    -e             Show the Runnable server environment variables
 ```
 
 Installation
@@ -152,6 +151,10 @@ NEW_RELIC_LOG_LEVEL             | fatal
 NEW_RELIC_NO_CONFIG_FILE        | true
 TEST_NEO4J                      | true
 -------------------------------------------------------------------------------------------------
+```
+
+### runnable watch
+```
 ```
 
 Issues
