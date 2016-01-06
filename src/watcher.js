@@ -13,6 +13,7 @@ var path = require('path')
 
 var Git = require('./git')
 var api = require('./api')
+var output = require('./output')
 
 class Watcher {
   /**
@@ -39,8 +40,8 @@ class Watcher {
     var git = new Git()
     var cwd = process.cwd()
 
-    nodeWatch(process.cwd(), (filepath) => {
-      var rel = path.relative(cwd, filepath)
+    nodeWatch(process.cwd(), (filePath) => {
+      var rel = path.relative(cwd, filePath)
       git.checkIgnore(rel).then((excluded) => {
         if (!excluded) { this._handleFileChange(rel) }
       })
@@ -48,32 +49,28 @@ class Watcher {
   }
 
   /**
-   * @param {String} filepath - relative filepath
+   * @param {String} filePath - relative filepath
    */
-  _handleFileChange (filepath) {
+  _handleFileChange (filePath) {
     var contents = '';
-    var spinString = '%s ' + filepath
-    var spinner;
+    var spinStringBase = './' + filePath + ' --> [remote]:' +
+      '/' + this._instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1] +
+      '/' + filePath
 
-    var stats = this._fetchContents(filepath)
+    var stats = this._fetchContents(filePath)
     if (stats.deleted) {
-      spinString += ' DELETE'
-      spinner = new Spinner(spinString.magenta)
-      spinner.start()
-      spinner.stop()
+      // spinString += ' DELETE'
+      // spinner = new Spinner(spinString.magenta)
+      // spinner.start()
+      // spinner.stop()
     } else {
-      spinString += ' UPDATE'
-      spinner = new Spinner(spinString.magenta)
-      spinner.start()
+      var stopSpinner = output.spinner(spinStringBase + ' %s', spinStringBase + ' [complete]')
       api.updateInstanceFile(this._instance.id,
         this._instance.container.dockerContainer,
         this._instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1],
-        filepath,
-        contents.toString())
-      .then((response) => {
-        spinner.stop(true)
-        console.log(filepath.magenta)
-      })
+        filePath,
+        stats.contents)
+      .then(stopSpinner)
     }
   }
 
