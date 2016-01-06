@@ -38,7 +38,7 @@ class Git {
         if (!originRemote) {
           throw new Error('No "origin" remote found for repository')
         }
-        var matches = originRemote.refs.fetch.match(/(\:|\/)([A-z0-9-_]+)\/([A-z0-9-_]+)\.git$/)
+        var matches = originRemote.refs.fetch.match(/(\:|\/)([A-z0-9-_]+)\/([A-z0-9-_]+)(\.git|)$/)
         return {
           orgName: matches[2],
           repoName: matches[3]
