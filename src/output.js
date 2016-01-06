@@ -21,14 +21,14 @@ var output = module.exports = {
    */
   spinner: (loadingMessage, finalMessage, clear) => {
     loadingMessage = loadingMessage || '%s '
-    var spinner = new Spinner(loadingMessage.magenta)
+    var spinner = new Spinner(output.colorize(loadingMessage))
     spinner.start()
     var alreadyRan = false
     return (arg) => {
       if (alreadyRan) return arg
       alreadyRan = true
       spinner.stop((exists(clear)) ? clear : true)
-      if (finalMessage) console.log(finalMessage.magenta)
+      if (finalMessage) console.log(output.colorize(finalMessage))
       return arg // for use in .then()
     }
   },
@@ -37,7 +37,14 @@ var output = module.exports = {
    * @param {String} message
    */
   general: (message) => {
-    console.log(message.magenta);
+    console.log(output.colorize(message))
+  },
+
+  /**
+   *
+   */
+  colorize: (str) => {
+    return str.magenta
   },
 
   /**

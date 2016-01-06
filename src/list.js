@@ -3,17 +3,20 @@
  * @exports {Function}
  */
 
-require('colors')
 var Table = require('cli-table')
+var binarySearchInsert = require('binary-search-insert')
+var hasKeypaths = require('101/has-keypaths')
 var keypather = require('keypather')()
 var moment = require('moment')
+
+var output = require('./output')
 
 /**
  * Create a formatted table from a collection of instances
  * @param {Object} options - Options passed from commander.js/cli arguments & flags
  * @param {Object} instance - Collection of instance objects from API
  */
-module.exports = (options, instances) => {
+var list = module.exports = (options, instances) => {
   var tableOpts = {
     chars: {
       'top': '-',
@@ -36,11 +39,19 @@ module.exports = (options, instances) => {
   }
   var table = new Table(tableOpts)
   // Repository Name  |  Branch Name  |  Status  |  Uptime  |  Shorthash  |  CreatedBy
-  instances.forEach((instance) => {
+
+  /* TODO pass in repo info
+  .filter(hasKeypaths({
+    'contextVersion.appCodeVersions[0].repo': instance.appCodeVersions[0].repo
+  }))
+  */
+
+  list._sortInstances(instances).forEach((instance) => {
+    var propFetch = instancePropertyFetch(instance)
     table.push([
-      _listStringProcess(
-        keypather.get(instance, 'contextVersion.appCodeVersions[0].repo'),
-        'magenta')
+      propFetch('contextVersion.appCodeVersions[0].repo'),
+      propFetch('contextVersion.appCodeVersions[0].branch'),
+      propFetch('container.inspect.State.Status')
     ])
   })
 
@@ -70,29 +81,31 @@ module.exports = (options, instances) => {
     keypather.get(instance, 'lowerName')].join('').magenta)
 */
   console.log(table.toString())
-
-  if (options.E) {
-    // Add ENV VARS to status output
-    table = new Table(tableOpts)
-    keypather.get(instance, 'env').forEach(function (env) {
-      table.push(env.split('='))
-    })
-    table.map(function (arr) {
-      arr[0] = arr[0].magenta
-    })
-    console.log('ENVIRONMENT VARIABLES'.magenta)
-    console.log(table.toString())
-  }
 }
 
 /**
- * Coerce non-string values to strings.
- * Apply color transformations
- * @param {*} val
- * @param {String|undefined} color
+ * TODO move to wrapper model??
+ * @param {Array<objects>} instances - immutable
+ * @return Array
  */
-var _listStringProcess = module.exports._listStringProcess = (val, color) => {
-  val = val || ''
-  if (color) return val[color]
-  return val
+module.exports._sortInstances = (instances) => {
+  var sortedInstances = []
+  var compareKeypath = 'contextVersion.appCodeVersions[0].repo'
+  var comparator = function (a, b) {
+    return keypather.get(a, compareKeypath) > keypather.get(b, compareKeypath)
+  }
+  instances.forEach(binarySearchInsert.bind(this, sortedInstances, comparator))
+  return sortedInstances
+}
+
+/**
+ * Temporary
+ */
+function instancePropertyFetch (instance) {
+  return function (keypath) {
+    var val = keypather.get(instance, keypath)
+    var valString = keypather.get(val, 'toString()')
+    if (!valString) return output.colorize('-')
+    return output.colorize(valString)
+  }
 }
