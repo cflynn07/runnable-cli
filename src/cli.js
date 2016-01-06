@@ -212,11 +212,14 @@ class CLI {
     api.fetchInstance()
       .then(stopSpinner)
       .then((instance) => {
+        let url;
         if (!target || target.toLowerCase() === 'runnable') {
-          open(output.instanceWebURL(instance))
+          url = output.instanceWebURL(instance)
         } else if (target.toLowerCase() === 'server') {
-          open(output.instanceServerURL(instance))
+          url = output.instanceServerURL(instance)
         }
+        open(url)
+        output.general(url)
       })
       .catch((err) => {
         console.log(err.message, err.stack)
