@@ -159,6 +159,26 @@ class API {
   }
 
   /**
+   *
+   */
+  updateInstanceFile (instanceId, containerId, lowerRepoName, relativePath, contents) {
+    return this._request({
+      method: 'PATCH',
+      url: ['instances', instanceId, 'containers', containerId,
+        'files', lowerRepoName, relativePath].join('/'),
+      body: {
+        body: contents
+      }
+    })
+  }
+
+  /**
+   *
+   */
+  deleteInstanceFile () {
+  }
+
+  /**
    * Generate Runnable instance name based on name pattern
    * @param {String} branch
    * @param {String} repo

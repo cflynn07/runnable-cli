@@ -15,12 +15,11 @@ var program = require('commander')
 var ContainerLogs = require('./container-logs')
 var Git = require('./git')
 var Terminal = require('./terminal')
+var Watcher = require('./watcher')
 var api = require('./api')
 var list = require('./list')
 var packageJSON = require('../package.json')
 var status = require('./status')
-
-var cli;
 
 /**
  * Main CLI class. The constructor function is the program entry point.
@@ -72,6 +71,11 @@ class CLI {
       .description('Show a Runnable server status')
       .option('-e', 'Show the Runnable server environment variables')
       .action(this._cmdStatus.bind(this))
+
+    program
+      .command('watch')
+      .description('Watch a repository and automatically upload changed files to a Runnable server')
+      .action(this._cmdWatch.bind(this))
 
     program
       .command('browse [runnable | server]')
@@ -246,6 +250,19 @@ class CLI {
       .catch((err) => {
         this._spinner.stop(true)
         console.log(err.message, err.stack)
+      })
+  }
+
+  /**
+   * Watch a repository and automatically upload changed files to a Runnable server
+   */
+  _cmdWatch () {
+    this._spinner.start()
+    api.fetchInstance()
+      .then((instance) => {
+        this._spinner.stop(true)
+        var watcher = new Watcher(instance)
+        watcher.watch()
       })
   }
 }
