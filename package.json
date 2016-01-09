@@ -48,6 +48,7 @@
     "commander": "^2.9.0",
     "keypather": "^1.10.1",
     "keypress": "^0.2.1",
+    "loadenv": "^2.1.0",
     "moment": "^2.11.0",
     "node-watch": "^0.3.5",
     "open": "0.0.5",
