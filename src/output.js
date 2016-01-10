@@ -10,53 +10,51 @@ require('colors')
 var Spinner = require('cli-spinner').Spinner
 var exists = require('101/exists')
 
-Spinner.setDefaultSpinnerString(Spinner.spinners[9])
+class Output {
+  /**
+   *
+   */
+  constructor () {
+    Spinner.setDefaultSpinnerString(Spinner.spinners[9])
+  }
 
-var output = module.exports = {
   /**
    * @param {String} loadingMessage
    * @param {String|undefined} finalMessage
    * @param {Boolean|undefined} clear
    * @return Function
    */
-  spinner: (loadingMessage, finalMessage, clear) => {
+  spinner (loadingMessage, finalMessage, clear) {
     loadingMessage = loadingMessage || '%s '
-    var spinner = new Spinner(output.colorize(loadingMessage))
+    var spinner = new Spinner(this.colorize(loadingMessage))
     spinner.start()
     var alreadyRan = false
     return (arg) => {
       if (alreadyRan) return arg
       alreadyRan = true
       spinner.stop((exists(clear)) ? clear : true)
-      if (finalMessage) console.log(output.colorize(finalMessage))
+      if (finalMessage) console.log(this.colorize(finalMessage))
       return arg // for use in .then()
     }
-  },
+  }
+
+  /**
+   * @param {String} message
+   * @param {Boolean} noColorize
+   */
+  toStdOut (message, noColorize) {
+    if (!noColorize) {
+      message = this.colorize(message)
+    }
+    console.log(message)
+  }
 
   /**
    * @param {String} message
    */
-  general: (message) => {
-    console.log(output.colorize(message))
-  },
-
-  /**
-   *
-   */
-  colorize: (str) => {
-    return str.magenta
-  },
-
-  /**
-   * Generate Runnable instance name based on name pattern
-   * @param {String} branch
-   * @param {String} repo
-   * @return String
-   */
-  instanceName: (branch, repo) => {
-    if (branch === 'master') {
-      return repo
-    }
-    return branch + '-' + repo
+  colorize (message) {
+    return message.magenta
   }
 }
+
+module.exports = Output

@@ -48,12 +48,28 @@ class InstanceModel extends BaseModel {
       process.env.RUNNABLE_CONTAINER_TLD
     ].join('')
   }
+
+  /**
+   * Generate Runnable instance name based on git data and naming pattern
+   * @param {String} branch
+   * @param {String} repo
+   * @return String
+   */
+  static instanceName (branch, repo) {
+    if (branch === 'master') {
+      return repo
+    }
+    return branch + '-' + repo
+  }
+
+  /**
+   * Factory method
+   * Instantiate and return an InstanceModel from provided data
+   * @returns InstanceModel
+   */
+  static instantiate (data) {
+    return new InstanceModel(data)
+  }
 }
 
-/**
- * Instantiate and return an InstanceModel from provided data
- * @returns InstanceModel
- */
-module.exports = (data) => {
-  return new InstanceModel(data)
-}
+module.exports = InstanceModel

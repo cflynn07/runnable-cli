@@ -13,12 +13,13 @@ class InstancesCollection extends BaseCollection {
   constructor (data) {
     super(data, InstanceModel)
   }
-}
 
-/**
- * Instantiate and return an InstancesCollection from provided data
- * @returns InstancesCollection
- */
-module.exports = (data) => {
-  return new InstancesCollection(data)
+  /**
+   * Factory method
+   * Instantiate and return an InstancesCollection from provided data
+   * @returns InstancesCollection
+   */
+  static instantiate (data) {
+    return new InstancesCollection(data)
+  }
 }

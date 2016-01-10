@@ -5,9 +5,13 @@
  */
 'use strict'
 
+require('colors')
+
 var CLITable = require('cli-table')
 
-class Table {
+var Output = require('./output')
+
+class Table extends Output {
   /**
    * Instantiate cli-table
    * Add cli-table instance to this
@@ -15,6 +19,7 @@ class Table {
    * @param {Object} tops
    */
   constructor (opts) {
+    super()
     this.table = new CLITable(opts)
   }
 
@@ -24,7 +29,7 @@ class Table {
    */
   _pushRow (row) {
     row = row.map((val) => {
-      return (val + '')
+      return this.colorize(val + '')
     })
     this.table.push(row)
   }
@@ -33,7 +38,7 @@ class Table {
    * Output table string to stdout
    */
   output () {
-    console.log(this.table.toString())
+    this.toStdOut(this.table.toString(), true)
   }
 }
 

@@ -75,7 +75,7 @@ class List extends Table {
   }
 
   /**
-   * Output table to stdtou
+   * Output table to stdout
    */
   output () {
     var sorted = this._sortInstances()

@@ -4,76 +4,76 @@
  */
 'use strict'
 
-require('colors')
-var Table = require('cli-table')
 var moment = require('moment')
 
-/**
- * Create a formatted table from instance object property values. Output to stdout.
- * @param {Object} options - Options passed from commander.js/cli arguments & flags
- * @param {Object} instance - Instance object from API
- */
-module.exports = (options, instance) => {
-  var tableOpts = {
-    chars: {
-      'top': '-',
-      'top-mid': '',
-      'top-left': '',
-      'top-right': '',
-      'bottom': '-',
-      'bottom-mid': '',
-      'bottom-left': '',
-      'bottom-right': '',
-      'left': '',
-      'left-mid': '',
-      'mid': '',
-      'mid-mid': '',
-      'right': '',
-      'right-mid': '',
-      'middle': ' | '
-    },
-    style: { 'padding-left': 0, 'padding-right': 0 }
+var Table = require('./table')
+
+class Status extends Table {
+  /**
+   * Define table formatting for parent class
+   * @constructor
+   * @param {InstanceModel}
+   */
+  constructor (instance) {
+    super({
+      chars: {
+        'top': '-',
+        'top-mid': '',
+        'top-left': '',
+        'top-right': '',
+        'bottom': '-',
+        'bottom-mid': '',
+        'bottom-left': '',
+        'bottom-right': '',
+        'left': '',
+        'left-mid': '',
+        'mid': '',
+        'mid-mid': '',
+        'right': '',
+        'right-mid': '',
+        'middle': ' | '
+      },
+      style: { 'padding-left': 0, 'padding-right': 0 }
+    })
+    this.instance = instance
   }
-  var table = new Table(tableOpts)
-  table.push([
-    'branch name',
-    instance.get('contextVersion.appCodeVersions[0].branch')
-  ], [
-    'cid',
-    instance.get('container.dockerContainer')
-  ], [
-    'created by',
-    instance.get('createdBy.username')
-  ], [
-    'github commit',
-    instance.get('contextVersion.appCodeVersions[0].commit')
-  ], [
-    'open ports',
-    Object.keys(instance.get('container.ports') || {}).join(', ')
-  ], [
-    'status',
-    instance.get('container.inspect.State.Status')
-  ], [
-    'uptime',
-    moment.duration(instance.get('container.inspect.State.StartedAt')).humanize()
-  ])
-  table.map(function (arr) {
-    arr[0] = arr[0].magenta
-  })
 
-  console.log(instance.instanceWebURL(instance).magenta)
-  console.log(table.toString())
+  /**
+   * Append rows for all instance status data
+   * @param {InstanceModel} instance
+   */
+  _seedTableData (instance) {
+    this._pushRow(['branch name', instance.get('contextVersion.appCodeVersions[0].branch')])
+    this._pushRow(['cid', instance.get('container.dockerHost')])
+    this._pushRow(['created by', instance.get('createdBy.username')])
+    this._pushRow(['github commit', instance.get('contextVersion.appCodeVersions[0].commit')])
+    this._pushRow(['open ports', Object.keys(instance.get('container.ports') || {}).join(', ')])
+    this._pushRow(['status', instance.get('container.inspect.State.Status')])
+    this._pushRow(['uptime',
+                  moment.duration(instance.get('container.inspect.State.StartedAt')).humanize()])
+  /*
+    if (options.E) {
+      // Add ENV VARS to status output
+      table = new Table(tableOpts)
+      instance.get('env').forEach(function (env) {
+        table.push(env.split('='))
+      })
+      table.map(function (arr) {
+        arr[0] = arr[0].magenta
+      })
+      console.log('ENVIRONMENT VARIABLES'.magenta)
+      console.log(table.toString())
+    }
+  */
+  }
 
-  if (options.E) {
-    // Add ENV VARS to status output
-    table = new Table(tableOpts)
-    instance.get('env').forEach(function (env) {
-      table.push(env.split('='))
-    })
-    table.map(function (arr) {
-      arr[0] = arr[0].magenta
-    })
-    console.log('ENVIRONMENT VARIABLES'.magenta)
-    console.log(table.toString())
+  /**
+   * Output table to stdout
+   */
+  output () {
+    this._seedTableData(this.instance)
+    super.output()
   }
 }
+
+module.exports = Status

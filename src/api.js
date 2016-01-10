@@ -44,7 +44,7 @@ class API {
     var instanceName
     return git.fetchRepositoryInfo()
       .then((repoData) => {
-        instanceName = output.instanceName(repoData.branch, repoData.repoName)
+        instanceName = InstanceModel.instanceName(repoData.branch, repoData.repoName)
         return this._request({
           url: '/instances',
           qs: {
@@ -58,7 +58,7 @@ class API {
                             repoData.orgName.toLowerCase() + '/' + instanceName.toLowerCase())
           }
           return response
-        }).then(compose(InstanceModel, pluck('body[0]')))
+        }).then(compose(InstanceModel.instantiate, pluck('body[0]')))
       })
   }
 
@@ -77,7 +77,7 @@ class API {
             githubUsername: repoData.orgName.toLowerCase(),
             ignoredFields: 'contextVersions,build.log,contextVersion.build.log'
           }
-        }).then(compose(InstancesCollection, pluck('body')))
+        }).then(compose(InstancesCollection.instantiate, pluck('body')))
       })
   }
 

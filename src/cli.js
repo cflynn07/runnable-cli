@@ -6,8 +6,6 @@
  */
 'use strict'
 
-require('colors')
-
 var defaults = require('101/defaults')
 defaults(process.env, {
   RUNNABLE_API_HOST: 'https://api.runnable.io',
@@ -20,18 +18,20 @@ var program = require('commander')
 
 var ContainerLogs = require('./container-logs')
 var List = require('./list')
+var Output = require('./output')
+var Status = require('./status')
 var Terminal = require('./terminal')
 var Watcher = require('./watcher')
 var api = require('./api')
-var output = require('./output')
 var packageJSON = require('../package.json')
-var status = require('./status')
 
 /**
  * Main CLI class. The constructor function is the program entry point.
  */
-class CLI {
+class CLI extends Output {
   constructor () {
+    super()
+
     program.version(packageJSON.version)
 
     program
@@ -190,10 +190,9 @@ class CLI {
    * Fetch a list of Runnable servers
    */
   _cmdList (options) {
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.fetchInstances()
       .then(stopSpinner)
-    //  .then(list.bind(list, options))
       .then((instances) => {
         var list = new List(instances)
         list.output()
@@ -234,10 +233,13 @@ class CLI {
    * Show a Runnable server status
    */
   _cmdStatus (options) {
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.fetchInstance()
       .then(stopSpinner)
-      .then(status.bind(this, options))
+      .then((instance) => {
+        var status = new Status(instance)
+        status.output()
+      })
       .catch((err) => {
         console.log(err.message, err.stack)
       })
