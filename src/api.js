@@ -11,6 +11,7 @@ var pluck = require('101/pluck')
 var request = require('request')
 
 var Git = require('./git')
+var InstanceModel = require('./models/instance')
 var output = require('./output')
 var packageJSON = require('../package.json')
 
@@ -56,7 +57,7 @@ class API {
                             repoData.orgName.toLowerCase() + '/' + instanceName.toLowerCase())
           }
           return response
-        }).then(compose(Immutable, pluck('body[0]')))
+        }).then(compose(InstanceModel, pluck('body[0]')))
       })
   }
 

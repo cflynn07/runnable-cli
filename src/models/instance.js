@@ -5,24 +5,52 @@
  */
 'use strict'
 
-var Immutable = require('seamless-immutable')
-
 var BaseModel = require('./base')
 
 /**
  * Functionality related to instance resources
  */
 class InstanceModel extends BaseModel {
-  attrs: null
-
   /**
    * Make properties immutable
    */
   constructor (data) {
-    this.attrs = Immutable(data)
-    Object.freeze(this.attrs)
+    super(data)
+  }
+
+  /**
+   * Generate the url of the instance page on Runnable
+   * @return String
+   */
+  instanceWebURL () {
+    return [
+      process.env.RUNNABLE_WEB_HOST,
+      this.get('owner.username'),
+      this.get('lowerName')
+    ].join('/')
+  }
+
+  /**
+   * Generate the url of the instance server
+   * @return String
+   */
+  instanceServerURL () {
+    var lowerRepo = this.get('contextVersion.appCodeVersions[0].lowerRepo')
+    lowerRepo = lowerRepo.split('/')[1]
+
+    return [
+      'http://',
+      this.get('shortHash'),
+      '-',
+      lowerRepo,
+      '-staging-',
+      this.get('owner.username'),
+      process.env.RUNNABLE_CONTAINER_TLD
+    ].join('')
   }
 }
+
+
 
 /**
  * Instantiate and return an InstanceModel from provided data

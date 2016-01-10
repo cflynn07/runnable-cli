@@ -6,7 +6,6 @@
 
 require('colors')
 var Table = require('cli-table')
-var keypather = require('keypather')()
 var moment = require('moment')
 
 var output = require('./output')
@@ -38,32 +37,39 @@ module.exports = (options, instance) => {
     style: { 'padding-left': 0, 'padding-right': 0 }
   }
   var table = new Table(tableOpts)
-  table.push(['branch name',
-             keypather.get(instance, 'contextVersion.appCodeVersions[0].branch')])
-  table.push(['cid',
-             keypather.get(instance, 'container.dockerContainer')])
-  table.push(['created by',
-             keypather.get(instance, 'createdBy.username')])
-  table.push(['github commit',
-             keypather.get(instance, 'contextVersion.appCodeVersions[0].commit')])
-  table.push(['open ports',
-             Object.keys(keypather.get(instance, 'container.ports') || {}).join(', ')])
-  table.push(['status',
-             keypather.get(instance, 'container.inspect.State.Status')])
-  table.push(['uptime',
-             moment.duration(keypather.get(instance, 'container.inspect.State.StartedAt'))
-             .humanize()])
+  table.push([
+    'branch name',
+    instance.get('contextVersion.appCodeVersions[0].branch')
+  ], [
+    'cid',
+    instance.get('container.dockerContainer')
+  ], [
+    'created by',
+    instance.get('createdBy.username')
+  ], [
+    'github commit',
+    instance.get('contextVersion.appCodeVersions[0].commit')
+  ], [
+    'open ports',
+    Object.keys(instance.get('container.ports') || {}).join(', ')
+  ], [
+    'status',
+    instance.get('container.inspect.State.Status')
+  ], [
+    'uptime',
+    moment.duration(instance.get('container.inspect.State.StartedAt')).humanize()
+  ])
   table.map(function (arr) {
     arr[0] = arr[0].magenta
   })
 
-  console.log(output.instanceWebURL(instance).magenta)
+  console.log(instance.instanceWebURL(instance).magenta)
   console.log(table.toString())
 
   if (options.E) {
     // Add ENV VARS to status output
     table = new Table(tableOpts)
-    keypather.get(instance, 'env').forEach(function (env) {
+    instance.get('env').forEach(function (env) {
       table.push(env.split('='))
     })
     table.map(function (arr) {

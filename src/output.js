@@ -48,36 +48,6 @@ var output = module.exports = {
   },
 
   /**
-   * Generate the url of the instance page on Runnable
-   * @param {Object} instance
-   * @return String
-   */
-  instanceWebURL: (instance) => {
-    return [
-      process.env.RUNNABLE_WEB_HOST,
-      instance.owner.username,
-      instance.lowerName
-    ].join('/')
-  },
-
-  /**
-   * Generate the url of the instance server
-   * @param {Object} instance
-   * @return String
-   */
-  instanceServerURL: (instance) => {
-    return [
-      'http://',
-      instance.shortHash,
-      '-',
-      instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1],
-      '-staging-',
-      instance.owner.username,
-      process.env.RUNNABLE_CONTAINER_TLD
-    ].join('')
-  },
-
-  /**
    * Generate Runnable instance name based on name pattern
    * @param {String} branch
    * @param {String} repo
