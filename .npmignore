@@ -4,4 +4,5 @@
 coverage/
 src/
 test-mocks/
-whitelist.txt
+whitelist-all.txt
+whitelist-test.txt
