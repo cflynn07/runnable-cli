@@ -1,5 +1,7 @@
 /**
  * Base class for shared model logic
+ * @module lib/models/base
+ * @exports BaseModel
  */
 'use strict'
 
@@ -8,7 +10,7 @@ var keypather = require('keypather')()
 
 class BaseModel {
   /**
-   *
+   * Invoke superclass constructor method to set up immutable instance
    */
   constructor (data) {
     this.attrs = Immutable(data)

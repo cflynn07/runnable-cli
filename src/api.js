@@ -12,6 +12,7 @@ var request = require('request')
 
 var Git = require('./git')
 var InstanceModel = require('./models/instance')
+var InstancesCollection = require('./collections/instances')
 var output = require('./output')
 var packageJSON = require('../package.json')
 
@@ -76,7 +77,7 @@ class API {
             githubUsername: repoData.orgName.toLowerCase(),
             ignoredFields: 'contextVersions,build.log,contextVersion.build.log'
           }
-        }).then(compose(Immutable, pluck('body')))
+        }).then(compose(InstancesCollection, pluck('body')))
       })
   }
 
