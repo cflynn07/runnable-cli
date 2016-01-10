@@ -13,7 +13,6 @@ var request = require('request')
 var Git = require('./git')
 var InstanceModel = require('./models/instance')
 var InstancesCollection = require('./collections/instances')
-var output = require('./output')
 var packageJSON = require('../package.json')
 
 class API {

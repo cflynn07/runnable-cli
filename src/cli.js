@@ -130,11 +130,11 @@ class CLI extends Output {
    * Start a Runnable server
    */
   _cmdStart () {
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.startInstance()
       .then(stopSpinner)
       .then((instance) => {
-        output.general(output.instanceWebURL(instance) + '\n' + 'Starting container...')
+        this.toStdOut(instance.instanceWebURL() + '\n' + 'Starting container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -145,11 +145,11 @@ class CLI extends Output {
    * Stop a Runnable server
    */
   _cmdStop () {
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.stopInstance()
       .then(stopSpinner)
       .then((instance) => {
-        output.general(output.instanceWebURL(instance) + '\n' + 'Stopping container...')
+        this.toStdOut.general(instance.instanceWebURL() + '\n' + 'Stopping container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -160,11 +160,11 @@ class CLI extends Output {
    * Restart a Runnable server
    */
   _cmdRestart () {
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.restartInstance()
       .then(stopSpinner)
       .then((instance) => {
-        output.general(output.instanceWebURL(instance) + '\n' + 'Restarting container...')
+        this.toStdOut(instance.instanceWebURL() + '\n' + 'Restarting container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -175,11 +175,11 @@ class CLI extends Output {
    * Rebuild a Runnable server
    */
   _cmdRebuild () {
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.rebuildInstance()
       .then(stopSpinner)
       .then((instance) => {
-        output.general(output.instanceWebURL(instance) + '\n' + 'Rebuilding container...')
+        this.toStdOut(instance.instanceWebURL() + '\n' + 'Rebuilding container...')
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -210,18 +210,18 @@ class CLI extends Output {
   _cmdBrowse (target) {
     // console.log('Opening a Runnable page in the default browser...'.magenta)
     // TODO handle ports
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.fetchInstance()
       .then(stopSpinner)
       .then((instance) => {
         let url
         if (!target || target.toLowerCase() === 'runnable') {
-          url = output.instanceWebURL(instance)
+          url = instance.instanceWebURL()
         } else if (target.toLowerCase() === 'server') {
-          url = output.instanceServerURL(instance)
+          url = instance.instanceServerURL()
         }
         open(url)
-        output.general(url)
+        this.toStdOut(url)
       })
       .catch((err) => {
         console.log(err.message, err.stack)
@@ -250,7 +250,7 @@ class CLI extends Output {
    * Watch a repository and automatically upload changed files to a Runnable server
    */
   _cmdWatch () {
-    var stopSpinner = output.spinner()
+    var stopSpinner = this.spinner()
     api.fetchInstance()
       .then(stopSpinner)
       .then((instance) => {

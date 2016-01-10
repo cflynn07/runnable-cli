@@ -6,22 +6,21 @@
 
 require('colors')
 
-var Spinner = require('cli-spinner').Spinner
 var fs = require('fs')
 var nodeWatch = require('node-watch')
 var path = require('path')
 
 var Git = require('./git')
+var Output = require('./output')
 var api = require('./api')
-var output = require('./output')
 
-class Watcher {
+class Watcher extends Output {
   /**
    * @param {Object} instance - immutable
    */
   constructor (instance) {
+    super()
     this._instance = instance
-
   }
 
   // EDIT: PATCH https://api.runnable.io/instances/55d3aa87b222f91c0036b2c3/containers/85af5a0438b1b82dc4a3b6515546f770cf2fc62270bcc350b3eb5a6d1c624963/files/api/README.md
@@ -52,7 +51,7 @@ class Watcher {
    * @param {String} filePath - relative filepath
    */
   _handleFileChange (filePath) {
-    var contents = '';
+    // var contents = '';
     var spinStringBase = './' + filePath + ' --> [remote]:' +
       '/' + this._instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1] +
       '/' + filePath
@@ -64,7 +63,7 @@ class Watcher {
       // spinner.start()
       // spinner.stop()
     } else {
-      var stopSpinner = output.spinner(spinStringBase + ' %s', spinStringBase + ' [complete]')
+      var stopSpinner = this.spinner(spinStringBase + ' %s', spinStringBase + ' [complete]')
       api.updateInstanceFile(this._instance.id,
         this._instance.container.dockerContainer,
         this._instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1],
@@ -81,7 +80,7 @@ class Watcher {
    *   - contents
    */
   _fetchContents (filepath) {
-    var contents;
+    var contents
     try {
       contents = fs.readFileSync(filepath)
     } catch (e) {
