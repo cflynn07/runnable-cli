@@ -50,8 +50,6 @@ class InstanceModel extends BaseModel {
   }
 }
 
-
-
 /**
  * Instantiate and return an InstanceModel from provided data
  * @returns InstanceModel

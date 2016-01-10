@@ -23,7 +23,7 @@ class API {
     this._request = request.defaults({
       baseUrl: process.env.RUNNABLE_API_HOST,
       headers: {
-        'User-Agent': ['Runnable CLI',  packageJSON.version].join(' ')
+        'User-Agent': ['Runnable CLI', packageJSON.version].join(' ')
       },
       jar: this._jar,
       json: true,
@@ -41,7 +41,7 @@ class API {
    */
   fetchInstance () {
     var git = new Git()
-    var instanceName;
+    var instanceName
     return git.fetchRepositoryInfo()
       .then((repoData) => {
         instanceName = output.instanceName(repoData.branch, repoData.repoName)

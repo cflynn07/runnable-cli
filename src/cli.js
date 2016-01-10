@@ -19,11 +19,10 @@ var open = require('open')
 var program = require('commander')
 
 var ContainerLogs = require('./container-logs')
-var Git = require('./git')
+var List = require('./list')
 var Terminal = require('./terminal')
 var Watcher = require('./watcher')
 var api = require('./api')
-var list = require('./list')
 var output = require('./output')
 var packageJSON = require('../package.json')
 var status = require('./status')
@@ -194,7 +193,11 @@ class CLI {
     var stopSpinner = output.spinner()
     api.fetchInstances()
       .then(stopSpinner)
-      .then(list.bind(list, options))
+    //  .then(list.bind(list, options))
+      .then((instances) => {
+        var list = new List(instances)
+        list.output()
+      })
       .catch((err) => {
         console.log(err.message, err.stack)
       })
@@ -212,7 +215,7 @@ class CLI {
     api.fetchInstance()
       .then(stopSpinner)
       .then((instance) => {
-        let url;
+        let url
         if (!target || target.toLowerCase() === 'runnable') {
           url = output.instanceWebURL(instance)
         } else if (target.toLowerCase() === 'server') {

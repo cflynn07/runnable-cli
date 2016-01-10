@@ -8,8 +8,6 @@ require('colors')
 var Table = require('cli-table')
 var moment = require('moment')
 
-var output = require('./output')
-
 /**
  * Create a formatted table from instance object property values. Output to stdout.
  * @param {Object} options - Options passed from commander.js/cli arguments & flags

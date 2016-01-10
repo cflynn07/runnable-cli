@@ -4,6 +4,8 @@
  */
 'use strict'
 
+var binarySearchInsert = require('binary-search-insert')
+
 class BaseCollection {
   /**
    * @param {Array} data
@@ -14,6 +16,17 @@ class BaseCollection {
       return model(resource)
     })
     Object.freeze(this.models)
+  }
+
+  /**
+   * Return a sorted copy of the collection
+   * @param {Function} comparator
+   * @return Array<InstanceModel>
+   */
+  sort (comparator) {
+    var sorted = []
+    this.models.forEach(binarySearchInsert.bind(this, sorted, comparator))
+    return sorted
   }
 }
 
