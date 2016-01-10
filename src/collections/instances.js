@@ -23,3 +23,5 @@ class InstancesCollection extends BaseCollection {
     return new InstancesCollection(data)
   }
 }
+
+module.exports = InstancesCollection
