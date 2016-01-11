@@ -1,7 +1,7 @@
 /**
  * Data model representing an instance resource
  * @module lib/models/instance
- * @exports Function
+ * @exports InstanceModel
  */
 'use strict'
 
