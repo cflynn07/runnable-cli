@@ -15,6 +15,7 @@ var request = require('request')
 var Git = require('./git')
 var InstanceModel = require('./models/instance')
 var InstancesCollection = require('./collections/instances')
+var UserModel = require('./models/user')
 var packageJSON = require('../package.json')
 
 class API {
@@ -36,10 +37,28 @@ class API {
   }
 
   /**
+   * Fetch a user object from API
+   * @return Promise - resolves:
+   *   UserModel
+   */
+  fetchUser () {
+    return this._request({
+      url: '/users/me'
+    })
+    .then((response) => {
+      if (!exists(response.body) || response.body.statusCode === 404) {
+        throw new UserNotFoundError()
+      }
+      return response.body
+    })
+    .then(UserModel.instantiate)
+  }
+
+  /**
    * Fetch an instance object from API
    * @param {String|Object} queryData
    * @returns Promise - resolves:
-   *   Immutable<Map>
+   *   InstanceModel
    */
   fetchInstance (queryData) {
     var url = '/instances/'
@@ -69,21 +88,18 @@ class API {
 
   /**
    * Fetch collection of instances from API
+   * @param {String} githubUsername
    * @return Promise - resolves:
-   *   Immutable<Set>
+   *   InstanceCollection
    */
-  fetchInstances () {
-    var git = new Git()
-    return git.fetchRepositoryInfo()
-      .then((repoData) => {
-        return this._request({
-          url: '/instances',
-          qs: {
-            githubUsername: repoData.orgName.toLowerCase(),
-            ignoredFields: 'contextVersions,build.log,contextVersion.build.log'
-          }
-        }).then(compose(InstancesCollection.instantiate, pluck('body')))
-      })
+  fetchInstances (githubUsername) {
+    return this._request({
+      url: '/instances',
+      qs: {
+        githubUsername: githubUsername.toLowerCase(),
+        ignoredFields: 'contextVersions,build.log,contextVersion.build.log'
+      }
+    }).then(compose(InstancesCollection.instantiate, pluck('body')))
   }
 
   /**
@@ -197,9 +213,20 @@ function InstanceNotFoundError (message, queryData) {
   this.message = message
   this.queryData = queryData
 }
+
+/**
+ * No user found (unauthenticated)
+ * @param {String} message
+ */
+function UserNotFoundError (message) {
+  this.message = message
+}
+
 InstanceNotFoundError.prototype = Object.create(Error.prototype)
+UserNotFoundError.prototype = Object.create(Error.prototype)
 
 module.exports = API
 module.exports.errors = Object.freeze({
-  InstanceNotFoundError: InstanceNotFoundError
+  InstanceNotFoundError: InstanceNotFoundError,
+  UserNotFoundError: UserNotFoundError
 })

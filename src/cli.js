@@ -27,6 +27,7 @@ var List = require('./list')
 var Output = require('./output')
 var Status = require('./status')
 var Terminal = require('./terminal')
+var UserModel = require('./models/user')
 var Watcher = require('./watcher')
 var packageJSON = require('../package.json')
 
@@ -92,7 +93,7 @@ class CLI extends Output {
       .action(this._cmdWatch.bind(this))
 
     program
-      .command('browse [runnable | server]')
+      .command('browse [id] [runnable | server]')
       .description('Open a Runnable page in the default browser')
       .action(this._cmdBrowse.bind(this))
 
@@ -233,14 +234,24 @@ class CLI extends Output {
    */
   _cmdList (options) {
     var stopSpinner = this.spinner()
-    api.fetchInstances()
+    this.git.fetchRepositoryInfo()
+      .catch(Git.errors.NotAGitRepoError, (err) => {
+        return this.api.fetchUser()
+      })
+      .then((data) => {
+        if (data instanceof UserModel) {
+          return data.get('accounts.github.username')
+        } else {
+          return data.orgName
+        }
+      })
+      .then(this.api.fetchInstances.bind(this.api))
       .then((instances) => {
         stopSpinner()
-        var list = new List(instances)
-        list.output()
+        new List(instances).output()
       })
       .catch((err) => {
-        // console.log(err)
+        console.log(err)
       })
       .finally(stopSpinner)
   }
@@ -249,14 +260,21 @@ class CLI extends Output {
    * Open a Runnable page in the default browser
    * @param {String} target - Optional, [Runnable, Server]
    */
-  _cmdBrowse (target) {
+  _cmdBrowse (id, target) {
+    if (id) {
+      let lowerID = id.toLowerCase()
+      if (lowerID === 'server' || lowerId === 'runnable') {
+        target = id
+        id = null
+      }
+    }
     // console.log('Opening a Runnable page in the default browser...'.magenta)
     // TODO handle ports
     var stopSpinner = this.spinner()
-    api.fetchInstance()
-      .then(stopSpinner)
+    this._fetchInstance(id)
       .then((instance) => {
-        let url
+        stopSpinner()
+        var url
         if (!target || target.toLowerCase() === 'runnable') {
           url = instance.instanceWebURL()
         } else if (target.toLowerCase() === 'server') {

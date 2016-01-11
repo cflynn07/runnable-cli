@@ -13,7 +13,7 @@ class BaseCollection {
    */
   constructor (data, model) {
     this.models = data.map((resource) => {
-      return model(resource)
+      return new model(resource)
     })
     Object.freeze(this.models)
   }
