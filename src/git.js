@@ -30,7 +30,7 @@ class Git {
     var fetchBranch = this._simpleGit.revparse(['--abbrev-ref', 'HEAD'])
       .then((status) => {
         return status.replace(/\n$/, '')
-      })
+      }, this._handleError)
 
     var fetchRemote = this._simpleGit.getRemotes(true)
       .then((remotes) => {
@@ -43,7 +43,7 @@ class Git {
           orgName: matches[2],
           repoName: matches[3]
         }
-      })
+      }, this._handleError)
 
     return Promise.join(fetchBranch, fetchRemote, (branch, remote) => {
       remote.branch = branch
@@ -61,6 +61,28 @@ class Git {
     return this._simpleGit.checkIgnore(relativePath)
       .then(compose(Boolean, pluck('length')))
   }
+
+  /**
+   * @throws
+   * @param {Error} err
+   */
+  _handleError (err) {
+    if (/^fatal: Not a git repository/.test(err.message)) {
+      throw new NotAGitRepoError(err.message)
+    }
+  }
 }
 
+/**
+ * Command run in a directory that is not a git repository
+ * @param {String} message
+ */
+function NotAGitRepoError (message) {
+  this.message = message
+}
+NotAGitRepoError.prototype = Object.create(Error.prototype)
+
 module.exports = Git
+module.exports.errors = Object.freeze({
+  NotAGitRepoError: NotAGitRepoError
+})

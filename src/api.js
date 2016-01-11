@@ -7,6 +7,8 @@
 var Immutable = require('seamless-immutable')
 var Promise = require('bluebird')
 var compose = require('101/compose')
+var exists = require('101/exists')
+var isString = require('101/is-string')
 var pluck = require('101/pluck')
 var request = require('request')
 
@@ -35,30 +37,34 @@ class API {
 
   /**
    * Fetch an instance object from API
+   * @param {String|Object} queryData
    * @returns Promise - resolves:
    *   Immutable<Map>
    */
-  fetchInstance () {
-    var git = new Git()
-    var instanceName
-    return git.fetchRepositoryInfo()
-      .then((repoData) => {
-        instanceName = InstanceModel.instanceName(repoData.branch, repoData.repoName)
-        return this._request({
-          url: '/instances',
-          qs: {
-            githubUsername: repoData.orgName.toLowerCase(),
-            name: instanceName.toLowerCase()
-          }
-        })
-        .then((response) => {
-          if (!response.body || !response.body.length) {
-            throw new Error('Instance not found: ' +
-                            repoData.orgName.toLowerCase() + '/' + instanceName.toLowerCase())
-          }
-          return response
-        }).then(compose(InstanceModel.instantiate, pluck('body[0]')))
-      })
+  fetchInstance (queryData) {
+    var url = '/instances/'
+    var qs = {}
+    if (isString(queryData)) {
+      url += queryData
+    } else {
+      let instanceName = InstanceModel.instanceName(queryData.branch, queryData.repoName)
+      qs = {
+        githubUsername: queryData.orgName.toLowerCase(),
+        name: instanceName.toLowerCase()
+      }
+    }
+    return this._request({
+      url: url,
+      qs: qs
+    })
+    .then((response) => {
+      var response = (Array.isArray(response.body)) ? response.body[0] : response.body
+      if (!exists(response) || response.statusCode === 404) {
+        throw new InstanceNotFoundError('Instance not found', queryData)
+      }
+      return response
+    })
+    .then(InstanceModel.instantiate)
   }
 
   /**
@@ -83,14 +89,11 @@ class API {
   /**
    *
    */
-  startInstance () {
-    return this.fetchInstance()
-      .then((instance) => {
-        return this._request({
-          method: 'PUT',
-          url: ['/instances/', instance.id, '/actions/start'].join('')
-        })
-      }).then(compose(Immutable, pluck('body')))
+  startInstance (instance) {
+    return this._request({
+      method: 'PUT',
+      url: ['/instances/', instance.get('id'), '/actions/start'].join('')
+    }).then(compose(InstanceModel.instantiate, pluck('body')))
   }
 
   /**
@@ -185,4 +188,18 @@ class API {
   }
 }
 
-module.exports = new API()
+/**
+ * No instance found for a given query
+ * @param {String} message
+ * @param {String|Object} queryData
+ */
+function InstanceNotFoundError (message, queryData) {
+  this.message = message
+  this.queryData = queryData
+}
+InstanceNotFoundError.prototype = Object.create(Error.prototype)
+
+module.exports = API
+module.exports.errors = Object.freeze({
+  InstanceNotFoundError: InstanceNotFoundError
+})

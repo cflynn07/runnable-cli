@@ -29,13 +29,14 @@ class Output {
     var spinner = new Spinner(this.colorize(loadingMessage))
     spinner.start()
     var alreadyRan = false
-    return (arg) => {
+    this.currentSpinnerStop = (arg) => {
       if (alreadyRan) return arg
       alreadyRan = true
       spinner.stop((exists(clear)) ? clear : true)
       if (finalMessage) console.log(this.colorize(finalMessage))
       return arg // for use in .then()
     }
+    return this.currentSpinnerStop
   }
 
   /**
@@ -46,6 +47,7 @@ class Output {
     if (!noColorize) {
       message = this.colorize(message)
     }
+    if (this.currentSpinnerStop) this.currentSpinnerStop()
     console.log(message)
   }
 

@@ -13,16 +13,21 @@ defaults(process.env, {
   RUNNABLE_CONTAINER_TLD: '.runnableapp.com'
 })
 
+var Promise = require('bluebird')
+var bindAll = require('101/bind-all')
+var isString = require('101/is-string')
 var open = require('open')
 var program = require('commander')
 
+var API = require('./api')
 var ContainerLogs = require('./container-logs')
+var Git = require('./git')
+var InstanceModel = require('./models/instance')
 var List = require('./list')
 var Output = require('./output')
 var Status = require('./status')
 var Terminal = require('./terminal')
 var Watcher = require('./watcher')
-var api = require('./api')
 var packageJSON = require('../package.json')
 
 /**
@@ -32,37 +37,43 @@ class CLI extends Output {
   constructor () {
     super()
 
+    this.api = new API()
+    this.git = new Git()
+
+    bindAll(this.api)
+    bindAll(this.git)
+
     program.version(packageJSON.version)
 
     program
-      .command('logs')
+      .command('logs [id]')
       .description('Tail the stdout of a Runnable server')
-      .action(this._cmdLogs)
+      .action(this._cmdLogs.bind(this))
 
     program
-      .command('ssh')
+      .command('ssh [id]')
       .description('Open a remote terminal session in a Runnable server')
-      .action(this._cmdSSH)
+      .action(this._cmdSSH.bind(this))
 
     program
-      .command('start')
+      .command('start [id]')
       .description('Start a Runnable server')
-      .action(this._cmdStart)
+      .action(this._cmdStart.bind(this))
 
     program
-      .command('stop')
+      .command('stop [id]')
       .description('Stop a Runnable server')
-      .action(this._cmdStop)
+      .action(this._cmdStop.bind(this))
 
     program
-      .command('restart')
+      .command('restart [id]')
       .description('Restart a Runnable server')
-      .action(this._cmdRestart)
+      .action(this._cmdRestart.bind(this))
 
     program
-      .command('rebuild')
+      .command('rebuild [id]')
       .description('Rebuild a Runnable server')
-      .action(this._cmdRebuild)
+      .action(this._cmdRebuild.bind(this))
 
     program
       .command('list')
@@ -70,7 +81,7 @@ class CLI extends Output {
       .action(this._cmdList.bind(this))
 
     program
-      .command('status')
+      .command('status [id]')
       .description('Show a Runnable server status')
       .option('-e', 'Show the Runnable server environment variables')
       .action(this._cmdStatus.bind(this))
@@ -100,90 +111,121 @@ class CLI extends Output {
    * Tail the stdout of a Runnable server.
    */
   _cmdLogs () {
-    api.fetchInstance() // TODO: Add org and name args here for manual specification
+    var stopSpinner = this.spinner()
+    this._fetchInstance()
       .then((instance) => {
+        stopSpinner()
         var containerLogs = new ContainerLogs(instance.container.dockerHost,
                                               instance.container.dockerContainer)
         containerLogs.fetchAndPipeToStdout()
       })
       .catch((err) => {
-        console.log(err.message)
+        console.log(err)
       })
+      .finally(stopSpinner)
   }
 
   /**
    * Open a remote terminal session in a Runnable server
+   * @param {String|undefined} id - instance shortHash
    */
-  _cmdSSH () {
-    api.fetchInstance()
+  _cmdSSH (id) {
+    var stopSpinner = this.spinner()
+    this._fetchInstance(id)
       .then((instance) => {
-        var terminal = new Terminal(instance.container.dockerHost,
-                                    instance.container.dockerContainer)
-        terminal.fetchAndPipeToStdout()
+        stopSpinner()
+        new Terminal(instance.get('container.dockerHost'),
+                     instance.get('container.dockerContainer'))
+          .fetchAndPipeToStdout()
       })
       .catch((err) => {
-        console.log(err.message, err.stack)
+        // console.log(err)
       })
+      .finally(stopSpinner)
   }
 
   /**
    * Start a Runnable server
+   * @param {String|undefined} id - instance shortHash
    */
-  _cmdStart () {
+  _cmdStart (id) {
     var stopSpinner = this.spinner()
-    api.startInstance()
-      .then(stopSpinner)
+    this._fetchInstance(id)
+      .then(this.api.startInstance)
       .then((instance) => {
-        this.toStdOut(instance.instanceWebURL() + '\n' + 'Starting container...')
+        stopSpinner()
+        this.toStdOut([
+          instance.instanceWebURL(),
+          'Starting server...'
+        ].join('\n'))
       })
       .catch((err) => {
-        console.log(err.message, err.stack)
+        // console.log(err)
       })
+      .finally(stopSpinner)
   }
 
   /**
    * Stop a Runnable server
+   * @param {String|undefined} id - instance shortHash
    */
-  _cmdStop () {
+  _cmdStop (id) {
     var stopSpinner = this.spinner()
-    api.stopInstance()
-      .then(stopSpinner)
+    this._fetchInstance(id)
+      .then(this.api.stopInstance)
       .then((instance) => {
-        this.toStdOut.general(instance.instanceWebURL() + '\n' + 'Stopping container...')
+        stopSpinner()
+        this.toStdOut.general([
+          instance.instanceWebURL(),
+          'Stopping server...'
+        ].join('\n'))
       })
       .catch((err) => {
-        console.log(err.message, err.stack)
+        // console.log(err)
       })
+      .finally(stopSpinner)
   }
 
   /**
    * Restart a Runnable server
+   * @param {String|undefined} id - instance shortHash
    */
-  _cmdRestart () {
+  _cmdRestart (id) {
     var stopSpinner = this.spinner()
-    api.restartInstance()
-      .then(stopSpinner)
+    this._fetchInstance(id)
+      .then(this.api.stopInstance)
       .then((instance) => {
-        this.toStdOut(instance.instanceWebURL() + '\n' + 'Restarting container...')
+        stopSpinner()
+        this.toStdOut([
+          instance.instanceWebURL(),
+          'Restarting server...'
+        ].join('\n'))
       })
       .catch((err) => {
-        console.log(err.message, err.stack)
+        // console.log(err)
       })
+      .finally(stopSpinner)
   }
 
   /**
    * Rebuild a Runnable server
+   * @param {String|undefined} id - instance shortHash
    */
-  _cmdRebuild () {
+  _cmdRebuild (id) {
     var stopSpinner = this.spinner()
-    api.rebuildInstance()
-      .then(stopSpinner)
+    this._fetchInstance(id)
+      .then(this.api.rebuildInstance)
       .then((instance) => {
-        this.toStdOut(instance.instanceWebURL() + '\n' + 'Rebuilding container...')
+        stopSpinner()
+        this.toStdOut([
+          instance.instanceWebURL(),
+          'Rebuilding server...'
+        ].join('\n'))
       })
       .catch((err) => {
-        console.log(err.message, err.stack)
+        // console.log(err)
       })
+      .finally(stopSpinner)
   }
 
   /**
@@ -192,13 +234,13 @@ class CLI extends Output {
   _cmdList (options) {
     var stopSpinner = this.spinner()
     api.fetchInstances()
-      .then(stopSpinner)
       .then((instances) => {
+        stopSpinner()
         var list = new List(instances)
         list.output()
       })
       .catch((err) => {
-        console.log(err.message, err.stack)
+        // console.log(err)
       })
       .finally(stopSpinner)
   }
@@ -231,17 +273,18 @@ class CLI extends Output {
 
   /**
    * Show a Runnable server status
+   * @param {String|undefined} id - instance shortHash
    */
-  _cmdStatus (options) {
+  _cmdStatus (id, options) {
     var stopSpinner = this.spinner()
-    api.fetchInstance()
-      .then(stopSpinner)
+    this._fetchInstance(id)
       .then((instance) => {
+        stopSpinner()
         var status = new Status(instance)
         status.output()
       })
       .catch((err) => {
-        console.log(err.message, err.stack)
+        // console.log(err.message, err.stack)
       })
       .finally(stopSpinner)
   }
@@ -251,12 +294,46 @@ class CLI extends Output {
    */
   _cmdWatch () {
     var stopSpinner = this.spinner()
-    api.fetchInstance()
-      .then(stopSpinner)
+    this._fetchInstance()
       .then((instance) => {
+        stopSpinner()
         var watcher = new Watcher(instance)
         watcher.watch()
       })
+  }
+
+  /**
+   * Fetch instance from cli-supplied instance shorthHash or local repository data
+   * @param {String|undefined} id - instance shortHash
+   * @returns Promise
+   */
+  _fetchInstance (id) {
+    var promise;
+
+    var handleNotAGitRepoError = (err) => {
+      this.toStdOut('Not a git repository: ' + process.cwd())
+      throw err
+    }
+
+    var handleInstanceNotFoundError = (err) => {
+      var instanceIdentifier = (isString(err.queryData)) ? err.queryData :
+        [err.queryData.orgName,
+         InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)].join('/')
+      this.toStdOut('Instance not found: ' + instanceIdentifier)
+      throw err
+    }
+
+    if (id) {
+      promise = this.api.fetchInstance(id)
+        .catch(API.errors.InstanceNotFoundError, handleInstanceNotFoundError)
+    } else {
+      promise = this.git.fetchRepositoryInfo()
+        .catch(Git.errors.NotAGitRepoError, handleNotAGitRepoError)
+        .then(this.api.fetchInstance.bind(this.api))
+        .catch(API.errors.InstanceNotFoundError, handleInstanceNotFoundError)
+    }
+
+    return promise
   }
 }
 
