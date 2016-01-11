@@ -5,13 +5,31 @@
 var test = require('unit.js')
 
 var Status = require('./status')
+var Table = require('./table')
+
 // var instanceMock = require('../test-mocks/instance')
 
 describe('lib/status.js', () => {
   it('load', () => {
-    test.function(Status).hasName('Status')
+    test
+      .function(Status)
+        .hasName('Status')
+      .object(new Status())
+        .isInstanceOf(Table)
   })
 
+  describe('Status class', () => {
+    describe('constructor', () => {
+      var status = new Status({})
+      test.object(status.instance).is({})
+    })
+
+    describe('_seedTableData', () => {
+    })
+
+    describe('output', () => {
+    })
+  })
 /*
   it('should output formatted table from instance object', (done) => {
     status({}, instanceMock)

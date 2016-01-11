@@ -28,7 +28,10 @@
   "homepage": "https://github.com/cflynn07/runnable-cli",
   "standard": {
     "parser": "babel-eslint",
-    "globals": ["describe", "it"]
+    "globals": [
+      "describe",
+      "it"
+    ]
   },
   "devDependencies": {
     "babel-cli": "^6.3.17",
