@@ -103,7 +103,7 @@ class API {
   }
 
   /**
-   *
+   * @param {InstanceModel} instance
    */
   startInstance (instance) {
     return this._request({
@@ -113,74 +113,64 @@ class API {
   }
 
   /**
-   *
+   * @param {InstanceModel} instance
    */
-  stopInstance () {
-    return this.fetchInstance()
-      .then((instance) => {
-        return this._request({
-          method: 'PUT',
-          url: ['/instances/', instance.id, '/actions/stop'].join('')
-        })
-      }).then(compose(Immutable, pluck('body')))
+  stopInstance (instance) {
+    return this._request({
+      method: 'PUT',
+      url: ['/instances/', instance.get('id'), '/actions/stop'].join('')
+    }).then(compose(InstanceModel.instantiate, pluck('body')))
   }
 
   /**
-   *
+   * @param {InstanceModel} instance
    */
-  restartInstance () {
-    return this.fetchInstance()
-      .then((instance) => {
-        return this._request({
-          method: 'PUT',
-          url: ['/instances/', instance.id, '/actions/restart'].join('')
-        })
-      }).then(compose(Immutable, pluck('body')))
+  restartInstance (instance) {
+    return this._request({
+      method: 'PUT',
+      url: ['/instances/', instance.get('id'), '/actions/restart'].join('')
+    }).then(compose(InstanceModel.instantiate, pluck('body')))
   }
 
   /**
-   *
+   * @param {InstanceModel} instance
    */
-  rebuildInstance () {
-    var _instance
-    return this.fetchInstance()
-      .then((instance) => {
-        // Perform a deep copy of the build
-        _instance = instance
-        return this._request({
-          method: 'POST',
-          url: ['/builds/', instance.build.id, '/actions/copy'].join(''),
-          qs: {
-            deep: true
-          }
-        }).then(compose(Immutable, pluck('body')))
+  rebuildInstance (instance) {
+    return this._request({
+      method: 'POST',
+      url: ['/builds/', instance.get('build.id'), '/actions/copy'].join(''),
+      qs: {
+        deep: true
+      }
+    })
+    .then(compose(Immutable, pluck('body')))
+    .then((build) => {
+      // build the copied build
+      return this._request({
+        method: 'POST',
+        url: ['/builds/', build.id, '/actions/build'].join(''),
+        body: {
+          message: 'manual build',
+          noCache: true
+        }
+      }).then(compose(Immutable, pluck('body')))
+    })
+    .then((build) => {
+      // Update instance with the new build
+      return this._request({
+        method: 'PATCH',
+        url: ['/instances/', instance.get('id')].join(''),
+        body: {
+          build: build.id
+        }
+      }).then((response) => {
+        if (response.body.statusCode > 300) {
+          throw new Error(response.body)
+        }
+        // Return original instance
+        return instance
       })
-      .then((body) => {
-        // build the copied build
-        return this._request({
-          method: 'POST',
-          url: ['/builds/', body.id, '/actions/build'].join(''),
-          body: {
-            message: 'manual build',
-            noCache: true
-          }
-        }).then(compose(Immutable, pluck('body')))
-      })
-      .then((body) => {
-        // Update instance with the new build
-        return this._request({
-          method: 'PATCH',
-          url: ['/instances/', _instance.id].join(''),
-          body: {
-            build: body.id
-          }
-        }).then((response) => {
-          if (response.body.statusCode > 300) {
-            throw new Error(response.body)
-          }
-          return response
-        }).then(compose(Immutable, pluck('body')))
-      })
+    })
   }
 
   /**

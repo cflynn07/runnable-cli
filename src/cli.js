@@ -116,12 +116,12 @@ class CLI extends Output {
     this._fetchInstance()
       .then((instance) => {
         stopSpinner()
-        var containerLogs = new ContainerLogs(instance.container.dockerHost,
-                                              instance.container.dockerContainer)
-        containerLogs.fetchAndPipeToStdout()
+        new ContainerLogs(instance.get('container.dockerHost'),
+                          instance.get('container.dockerContainer'))
+          .fetchAndPipeToStdout()
       })
       .catch((err) => {
-        console.log(err)
+        // console.log(err)
       })
       .finally(stopSpinner)
   }
@@ -152,7 +152,7 @@ class CLI extends Output {
   _cmdStart (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.startInstance)
+      .then(this.api.startInstance.bind(this.api))
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
@@ -173,10 +173,10 @@ class CLI extends Output {
   _cmdStop (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.stopInstance)
+      .then(this.api.stopInstance.bind(this.api))
       .then((instance) => {
         stopSpinner()
-        this.toStdOut.general([
+        this.toStdOut([
           instance.instanceWebURL(),
           'Stopping server...'
         ].join('\n'))
@@ -194,7 +194,7 @@ class CLI extends Output {
   _cmdRestart (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.stopInstance)
+      .then(this.api.stopInstance.bind(this.api))
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
@@ -215,7 +215,7 @@ class CLI extends Output {
   _cmdRebuild (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.rebuildInstance)
+      .then(this.api.rebuildInstance.bind(this.api))
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
@@ -224,7 +224,7 @@ class CLI extends Output {
         ].join('\n'))
       })
       .catch((err) => {
-        // console.log(err)
+        console.log(err.stack)
       })
       .finally(stopSpinner)
   }
@@ -251,7 +251,7 @@ class CLI extends Output {
         new List(instances).output()
       })
       .catch((err) => {
-        console.log(err)
+        // console.log(err)
       })
       .finally(stopSpinner)
   }
