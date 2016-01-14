@@ -8,13 +8,13 @@
   },
   "scripts": {
     "build": "babel ./src -d ./lib",
-    "generate-all-whitelist": "find ./src -name '*.js' > ./whitelist-all.txt",
-    "generate-test-whitelist": "find ./src -name '*_test.js' > ./whitelist-test.txt",
-    "lint": "npm run generate-all-whitelist; standard -v `cat ./whitelist-all.txt`; npm run remove-whitelist",
+    "lint": "npm run whitelist-generate-all; standard -v `cat ./whitelist-all.txt`; npm run whitelist-remove",
     "prepublish": "npm run build",
-    "remove-whitelist": "rm ./whitelist*.txt",
-    "test": "npm run lint; npm run generate-test-whitelist; istanbul cover _mocha `cat ./whitelist-test.txt`; npm run remove-whitelist; istanbul check-coverage --statement 100 --branch 100 --function 100 --line 100",
-    "test-html-cov": "npm run generate-test-whitelist; istanbul cover _mocha `cat ./whitelist-test.txt`; npm run remove-whitelist; open -a 'Google Chrome' coverage/lcov-report/index.html"
+    "test": "npm run lint; npm run whitelist-generate-test; istanbul cover _mocha `cat ./whitelist-test.txt`; npm run whitelist-remove; istanbul check-coverage --statement 100 --branch 100 --function 100 --line 100",
+    "test-html-cov": "npm run whitelist-generate-test; istanbul cover _mocha `cat ./whitelist-test.txt`; npm run whitelist-remove; open -a 'Google Chrome' coverage/lcov-report/index.html",
+    "whitelist-generate-all": "find ./src -name '*.js' > ./whitelist-all.txt",
+    "whitelist-generate-test": "find ./src -name '*_test.js' > ./whitelist-test.txt",
+    "whitelist-remove": "rm ./whitelist*.txt"
   },
   "repository": {
     "type": "git",
