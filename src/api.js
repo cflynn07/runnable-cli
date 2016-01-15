@@ -12,7 +12,6 @@ var isString = require('101/is-string')
 var pluck = require('101/pluck')
 var request = require('request')
 
-var Git = require('./git')
 var InstanceModel = require('./models/instance')
 var InstancesCollection = require('./collections/instances')
 var UserModel = require('./models/user')
@@ -77,7 +76,7 @@ class API {
       qs: qs
     })
     .then((response) => {
-      var response = (Array.isArray(response.body)) ? response.body[0] : response.body
+      response = (Array.isArray(response.body)) ? response.body[0] : response.body
       if (!exists(response) || response.statusCode === 404) {
         throw new InstanceNotFoundError('Instance not found', queryData)
       }
