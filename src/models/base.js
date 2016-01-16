@@ -8,11 +8,14 @@
 var Immutable = require('seamless-immutable')
 var keypather = require('keypather')()
 
-class BaseModel {
+const API = require('../api')
+
+class BaseModel extends API {
   /**
    * Invoke superclass constructor method to set up immutable instance
    */
   constructor (data) {
+    super()
     this.attrs = Immutable(data)
     Object.freeze(this.attrs)
   }

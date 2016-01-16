@@ -4,14 +4,17 @@
  */
 'use strict'
 
-var binarySearchInsert = require('binary-search-insert')
+const binarySearchInsert = require('binary-search-insert')
 
-class BaseCollection {
+const API = require('../api')
+
+class BaseCollection extends API {
   /**
    * @param {Array} data
    * @param {Object} model
    */
   constructor (data, model) {
+    super()
     this.models = data.map((resource) => {
       return new model(resource)
     })
