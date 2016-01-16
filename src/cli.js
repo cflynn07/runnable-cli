@@ -328,12 +328,12 @@ class CLI extends Output {
   _fetchInstance (id) {
     var promise
 
-    var handleNotAGitRepoError = (err) => {
+    const handleNotAGitRepoError = (err) => {
       this.toStdOut('Not a git repository: ' + process.cwd())
       throw err
     }
 
-    var handleInstanceNotFoundError = (err) => {
+    const handleInstanceNotFoundError = (err) => {
       var instanceIdentifier = (isString(err.queryData)) ? err.queryData :
         [err.queryData.orgName,
          InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)].join('/')
