@@ -326,7 +326,7 @@ class CLI extends Output {
    * @returns Promise
    */
   _fetchInstance (id) {
-    var promise;
+    var promise
 
     var handleNotAGitRepoError = (err) => {
       this.toStdOut('Not a git repository: ' + process.cwd())

@@ -4,9 +4,9 @@
  * @exports {Function}
  */
 
-var Primus = require('primus')
-var http = require('http')
-var substream = require('substream')
+const Primus = require('primus')
+const http = require('http')
+const substream = require('substream')
 
 /**
  * Creates new Primus client instance

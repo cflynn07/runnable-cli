@@ -1,6 +1,7 @@
 /**
  * @module lib/status_test
  */
+'use strict'
 
 const test = require('unit.js')
 
