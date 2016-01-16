@@ -3,7 +3,7 @@
  * @exports {Function}
  */
 
-var Table = require('./Table')
+const Table = require('./Table')
 
 class List extends Table {
   /**

@@ -4,18 +4,18 @@
  */
 'use strict'
 
-var Immutable = require('seamless-immutable')
-var Promise = require('bluebird')
-var compose = require('101/compose')
-var exists = require('101/exists')
-var isString = require('101/is-string')
-var pluck = require('101/pluck')
-var request = require('request')
+const Immutable = require('seamless-immutable')
+const Promise = require('bluebird')
+const compose = require('101/compose')
+const exists = require('101/exists')
+const isString = require('101/is-string')
+const pluck = require('101/pluck')
+const request = require('request')
 
-var InstanceModel = require('./models/instance')
-var InstancesCollection = require('./collections/instances')
-var UserModel = require('./models/user')
-var packageJSON = require('../package.json')
+const InstanceModel = require('./models/instance')
+const InstancesCollection = require('./collections/instances')
+const UserModel = require('./models/user')
+const packageJSON = require('../package.json')
 
 class API {
   constructor () {

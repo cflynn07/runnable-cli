@@ -6,13 +6,13 @@
 
 require('colors')
 
-var fs = require('fs')
-var nodeWatch = require('node-watch')
-var path = require('path')
+const fs = require('fs')
+const nodeWatch = require('node-watch')
+const path = require('path')
 
-var Git = require('./git')
-var Output = require('./output')
-var api = require('./api')
+const Git = require('./git')
+const Output = require('./output')
+const api = require('./api')
 
 class Watcher extends Output {
   /**

@@ -4,7 +4,7 @@
  */
 'use strict'
 
-var socket = require('./socket')
+const socket = require('./socket')
 
 class ContainerLogs {
   /**

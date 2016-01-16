@@ -4,12 +4,12 @@
  */
 'use strict'
 
-var Promise = require('bluebird')
-var compose = require('101/compose')
-var find = require('101/find')
-var hasKeypaths = require('101/has-keypaths')
-var pluck = require('101/pluck')
-var simpleGit = require('simple-git')
+const Promise = require('bluebird')
+const compose = require('101/compose')
+const find = require('101/find')
+const hasKeypaths = require('101/has-keypaths')
+const pluck = require('101/pluck')
+const simpleGit = require('simple-git')
 
 class Git {
   constructor () {

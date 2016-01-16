@@ -7,9 +7,9 @@
 
 require('colors')
 
-var CLITable = require('cli-table')
+const CLITable = require('cli-table')
 
-var Output = require('./output')
+const Output = require('./output')
 
 class Table extends Output {
   /**

@@ -6,30 +6,30 @@
  */
 'use strict'
 
-var defaults = require('101/defaults')
+const defaults = require('101/defaults')
 defaults(process.env, {
   RUNNABLE_API_HOST: 'https://api.runnable.io',
   RUNNABLE_WEB_HOST: 'https://runnable.io',
   RUNNABLE_CONTAINER_TLD: '.runnableapp.com'
 })
 
-var Promise = require('bluebird')
-var bindAll = require('101/bind-all')
-var isString = require('101/is-string')
-var open = require('open')
-var program = require('commander')
+const Promise = require('bluebird')
+const bindAll = require('101/bind-all')
+const isString = require('101/is-string')
+const open = require('open')
+const program = require('commander')
 
-var API = require('./api')
-var ContainerLogs = require('./container-logs')
-var Git = require('./git')
-var InstanceModel = require('./models/instance')
-var List = require('./list')
-var Output = require('./output')
-var Status = require('./status')
-var Terminal = require('./terminal')
-var UserModel = require('./models/user')
-var Watcher = require('./watcher')
-var packageJSON = require('../package.json')
+const API = require('./api')
+const ContainerLogs = require('./container-logs')
+const Git = require('./git')
+const InstanceModel = require('./models/instance')
+const List = require('./list')
+const Output = require('./output')
+const Status = require('./status')
+const Terminal = require('./terminal')
+const UserModel = require('./models/user')
+const Watcher = require('./watcher')
+const packageJSON = require('../package.json')
 
 /**
  * Main CLI class. The constructor function is the program entry point.

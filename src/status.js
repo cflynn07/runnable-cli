@@ -4,9 +4,9 @@
  */
 'use strict'
 
-var moment = require('moment')
+const moment = require('moment')
 
-var Table = require('./table')
+const Table = require('./table')
 
 class Status extends Table {
   /**

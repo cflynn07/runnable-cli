@@ -4,11 +4,11 @@
  */
 'use strict'
 
-var keypress = require('keypress')
-var keypather = require('keypather')()
-var uuid = require('uuid')
+const keypress = require('keypress')
+const keypather = require('keypather')()
+const uuid = require('uuid')
 
-var socket = require('./socket')
+const socket = require('./socket')
 
 class Terminal {
   /**

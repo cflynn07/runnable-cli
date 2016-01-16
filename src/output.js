@@ -7,8 +7,8 @@
 
 require('colors')
 
-var Spinner = require('cli-spinner').Spinner
-var exists = require('101/exists')
+const Spinner = require('cli-spinner').Spinner
+const exists = require('101/exists')
 
 class Output {
   /**
