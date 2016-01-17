@@ -28,7 +28,7 @@ class InstanceModel extends BaseModel {
    * Generate the url of the instance page on Runnable
    * @return String
    */
-  instanceWebURL () {
+  webURL () {
     return [
       process.env.RUNNABLE_WEB_HOST,
       this.get('owner.username'),
@@ -40,7 +40,7 @@ class InstanceModel extends BaseModel {
    * Generate the url of the instance server
    * @return String
    */
-  instanceServerURL () {
+  serverURL () {
     var lowerRepo = this.get('contextVersion.appCodeVersions[0].lowerRepo')
     lowerRepo = lowerRepo.split('/')[1]
 
@@ -53,6 +53,16 @@ class InstanceModel extends BaseModel {
       this.get('owner.username'),
       process.env.RUNNABLE_CONTAINER_TLD
     ].join('')
+  }
+
+  /**
+   * Extract and return an instance's repository name
+   * @return String
+   */
+  repositoryName () {
+    const repo = this.get('contextVersion.appCodeVersions[0].lowerRepo')
+    if (!repo) { return '' }
+    return repo.split('/')[1]
   }
 
   /**

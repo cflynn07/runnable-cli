@@ -156,7 +156,7 @@ class CLI extends Output {
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Starting server...'
         ].join('\n'))
       })
@@ -179,7 +179,7 @@ class CLI extends Output {
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Stopping server...'
         ].join('\n'))
       })
@@ -202,7 +202,7 @@ class CLI extends Output {
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Restarting server...'
         ].join('\n'))
       })
@@ -225,7 +225,7 @@ class CLI extends Output {
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Rebuilding server...'
         ].join('\n'))
       })
@@ -283,9 +283,9 @@ class CLI extends Output {
         stopSpinner()
         var url
         if (!target || target.toLowerCase() === 'runnable') {
-          url = instance.instanceWebURL()
+          url = instance.webURL()
         } else if (target.toLowerCase() === 'server') {
-          url = instance.instanceServerURL()
+          url = instance.serverURL()
         }
         open(url)
         this.toStdOut(url)

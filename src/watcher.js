@@ -12,11 +12,13 @@ const path = require('path')
 
 const Git = require('./git')
 const Output = require('./output')
-const api = require('./api')
+
+// const api = require('./api')
 
 class Watcher extends Output {
   /**
-   * @param {Object} instance - immutable
+   * @constructor
+   * @param {InstanceModel} instance
    */
   constructor (instance) {
     super()
@@ -35,10 +37,14 @@ class Watcher extends Output {
   //   - isDir: <boolean>
   //   - name: <string>
 
+  /**
+   * Watch pwd for file changes
+   * When a file change is detected, run `git check-ignore` to see if the file is ignored by the
+   * repository. Process the file if it is not ignored.
+   */
   watch () {
     var git = new Git()
     var cwd = process.cwd()
-
     nodeWatch(process.cwd(), (filePath) => {
       var rel = path.relative(cwd, filePath)
       git.checkIgnore(rel).then((excluded) => {
@@ -52,9 +58,10 @@ class Watcher extends Output {
    */
   _handleFileChange (filePath) {
     // var contents = '';
-    var spinStringBase = './' + filePath + ' --> [remote]:' +
-      '/' + this._instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1] +
-      '/' + filePath
+    var spinStringBase = './' +
+      filePath + ' --> [remote]:' +
+        '/' + this._instance.repositoryName() +
+        '/' + filePath
 
     var stats = this._fetchContents(filePath)
     if (stats.deleted) {
