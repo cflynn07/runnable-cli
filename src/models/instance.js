@@ -144,6 +144,31 @@ class InstanceModel extends BaseModel {
   }
 
   /**
+   * Create or insert a file on an instance server
+   * @param {String} relativePath
+   * @param {String} contents
+   * @return Promise
+   */
+  uploadFile (relativePath, contents) {
+    const url = [
+      'instances',
+      this.get('id'),
+      'containers',
+      this.get('container.dockerContainer'),
+      'files',
+      this.repositoryName(),
+      relativePath
+    ].join('/')
+    return this.constructor.instanceResourceRequest({
+      method: 'PATCH',
+      url: url,
+      body: {
+        body: contents
+      }
+    })
+  }
+
+  /**
    * Generate Runnable instance name based on git data and naming pattern
    * @param {String} branch
    * @param {String} repo

@@ -309,7 +309,7 @@ class CLI extends Output {
         status.output()
       })
       .catch((err) => {
-        // console.log(err.message, err.stack)
+        console.log(err.message, err.stack)
       })
       .finally(stopSpinner)
   }
@@ -341,9 +341,10 @@ class CLI extends Output {
     }
 
     const handleInstanceNotFoundError = (err) => {
-      var instanceIdentifier = (isString(err.queryData)) ? err.queryData :
+      var instanceIdentifier = (isString(err.queryData)) ?
+        err.queryData :
         [err.queryData.orgName,
-         InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)].join('/')
+        InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)].join('/')
       this.toStdOut('Instance not found: ' + instanceIdentifier)
       throw err
     }

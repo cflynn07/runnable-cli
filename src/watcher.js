@@ -58,10 +58,15 @@ class Watcher extends Output {
    */
   _handleFileChange (filePath) {
     // var contents = '';
-    var spinStringBase = './' +
-      filePath + ' --> [remote]:' +
-        '/' + this._instance.repositoryName() +
-        '/' + filePath
+    var spinStringBase = [
+      './',
+      filePath,
+      ' --> [remote]:',
+      '/',
+      this._instance.repositoryName(),
+      '/',
+      filePath
+    ].join('')
 
     var stats = this._fetchContents(filePath)
     if (stats.deleted) {
@@ -71,12 +76,11 @@ class Watcher extends Output {
       // spinner.stop()
     } else {
       var stopSpinner = this.spinner(spinStringBase + ' %s', spinStringBase + ' [complete]')
-      api.updateInstanceFile(this._instance.id,
-        this._instance.container.dockerContainer,
-        this._instance.contextVersion.appCodeVersions[0].lowerRepo.split('/')[1],
-        filePath,
-        stats.contents)
-      .then(stopSpinner)
+      this._instance.uploadFile(filePath, stats.contents)
+        .then((instance) => {
+          stopSpinner()
+          this._instance = instance
+        })
     }
   }
 
