@@ -5,9 +5,9 @@
  */
 'use strict'
 
-var Immutable = require('seamless-immutable')
-var exists = require('101/exists')
-var keypather = require('keypather')()
+const Immutable = require('seamless-immutable')
+const exists = require('101/exists')
+const keypather = require('keypather')()
 
 const httpClient = require('../http-client')
 
@@ -32,7 +32,7 @@ class BaseModel {
    * Centralized API resource request handling
    * @param {Object} queryOpts
    */
-  static instanceResourceRequest (queryOpts) {
+  static instanceSesourceRequest (queryOpts) {
     return httpClient(queryOpts)
       .then((response) => {
         if (!exists(response) || response.statusCode === 404) {

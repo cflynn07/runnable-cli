@@ -3,8 +3,8 @@
  */
 'use strict'
 
-var BaseCollection = require('./base')
-var InstanceModel = require('../models/instance')
+const BaseCollection = require('./base')
+const InstanceModel = require('../models/instance')
 
 const basePath = '/instances'
 
