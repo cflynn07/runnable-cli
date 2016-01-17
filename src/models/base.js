@@ -38,7 +38,7 @@ class BaseModel {
         if (!exists(response) || response.statusCode === 404) {
           throw new Error(queryOpts)
         }
-        return (Array.isArray(response.body)) ? response.body[0] : response.body
+        return Array.isArray(response.body) ? response.body[0] : response.body
       })
   }
 }
