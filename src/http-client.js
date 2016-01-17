@@ -4,6 +4,8 @@
  */
 'use strict'
 
+require('loadenv')()
+
 const Promise = require('bluebird')
 const request = require('request')
 
