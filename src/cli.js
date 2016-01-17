@@ -13,7 +13,6 @@ defaults(process.env, {
   RUNNABLE_CONTAINER_TLD: '.runnableapp.com'
 })
 
-const Promise = require('bluebird')
 const bindAll = require('101/bind-all')
 const isString = require('101/is-string')
 const open = require('open')
@@ -30,6 +29,7 @@ const Status = require('./status')
 const Terminal = require('./terminal')
 const UserModel = require('./models/user')
 const Watcher = require('./watcher')
+const error = require('./error')
 const packageJSON = require('../package.json')
 
 /**
@@ -118,9 +118,7 @@ class CLI extends Output {
                           instance.get('container.dockerContainer'))
           .fetchAndPipeToStdout()
       })
-      .catch((err) => {
-        // console.log(err)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -137,9 +135,7 @@ class CLI extends Output {
                      instance.get('container.dockerContainer'))
           .fetchAndPipeToStdout()
       })
-      .catch((err) => {
-        // console.log(err)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -160,9 +156,7 @@ class CLI extends Output {
           'Starting server...'
         ].join('\n'))
       })
-      .catch((err) => {
-        console.log(err.stack)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -183,9 +177,7 @@ class CLI extends Output {
           'Stopping server...'
         ].join('\n'))
       })
-      .catch((err) => {
-        // console.log(err)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -206,9 +198,7 @@ class CLI extends Output {
           'Restarting server...'
         ].join('\n'))
       })
-      .catch((err) => {
-        // console.log(err)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -229,9 +219,7 @@ class CLI extends Output {
           'Rebuilding server...'
         ].join('\n'))
       })
-      .catch((err) => {
-        console.log(err.stack)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -241,7 +229,7 @@ class CLI extends Output {
   _cmdList (options) {
     var stopSpinner = this.spinner()
     this.git.fetchRepositoryInfo()
-      .catch(Git.errors.NotAGitRepoError, (err) => {
+      .catch(Git.errors.NotAGitRepoError, () => {
         return UserModel.fetch()
       })
       .then((data) => {
@@ -257,9 +245,7 @@ class CLI extends Output {
         stopSpinner()
         new List(instances).output()
       })
-      .catch((err) => {
-        console.log(err.stack)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -270,7 +256,7 @@ class CLI extends Output {
   _cmdBrowse (id, target) {
     if (id) {
       let lowerID = id.toLowerCase()
-      if (lowerID === 'server' || lowerId === 'runnable') {
+      if (lowerID === 'server' || lowerID === 'runnable') {
         target = id
         id = null
       }
@@ -290,9 +276,7 @@ class CLI extends Output {
         open(url)
         this.toStdOut(url)
       })
-      .catch((err) => {
-        console.log(err.message, err.stack)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -308,9 +292,7 @@ class CLI extends Output {
         var status = new Status(instance)
         status.output()
       })
-      .catch((err) => {
-        console.log(err.message, err.stack)
-      })
+      .catch(error)
       .finally(stopSpinner)
   }
 
@@ -341,10 +323,11 @@ class CLI extends Output {
     }
 
     const handleInstanceNotFoundError = (err) => {
-      var instanceIdentifier = (isString(err.queryData)) ?
-        err.queryData :
-        [err.queryData.orgName,
-        InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)].join('/')
+      var instanceIdentifier = (isString(err.queryData)) ? err.queryData
+        : [
+          err.queryData.orgName,
+          InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)
+        ].join('/')
       this.toStdOut('Instance not found: ' + instanceIdentifier)
       throw err
     }

@@ -5,11 +5,9 @@
  */
 'use strict'
 
-const exists = require('101/exists')
 const isString = require('101/is-string')
 
 const BaseModel = require('./base')
-const ErrorInstance404 = require('../errors/instance-404')
 
 const basePath = '/instances'
 

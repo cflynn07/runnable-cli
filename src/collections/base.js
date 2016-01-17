@@ -14,9 +14,9 @@ class BaseCollection {
    * @param {Array} data
    * @param {Object} model
    */
-  constructor (data, model) {
+  constructor (data, Model) {
     this.models = data.map((resource) => {
-      return new model(resource)
+      return new Model(resource)
     })
     Object.freeze(this.models)
   }
