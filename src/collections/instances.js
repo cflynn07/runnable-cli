@@ -6,6 +6,8 @@
 var BaseCollection = require('./base')
 var InstanceModel = require('../models/instance')
 
+const basePath = '/instances'
+
 class InstancesCollection extends BaseCollection {
   /**
    * Invoke superclass constructor method to set up collection of immutable instances
@@ -21,6 +23,24 @@ class InstancesCollection extends BaseCollection {
    */
   static instantiate (data) {
     return new InstancesCollection(data)
+  }
+
+  /**
+   * Fetch instances collection from API
+   * @param {String} githubUsername
+   * @returns Promise - resolves:
+   *   InstancesCollection
+   */
+  static fetch (githubUsername) {
+    const queryOpts = {
+      url: basePath,
+      qs: {
+        githubUsername: githubUsername.toLowerCase(),
+        ignoredFields: 'contextVersions,build.log,contextVersion.build.log'
+      }
+    }
+    return super.collectionResourceRequest(queryOpts)
+      .then(InstancesCollection.instantiate)
   }
 }
 

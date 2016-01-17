@@ -6,16 +6,16 @@
 'use strict'
 
 var Immutable = require('seamless-immutable')
+var exists = require('101/exists')
 var keypather = require('keypather')()
 
-const API = require('../api')
+const httpClient = require('../http-client')
 
-class BaseModel extends API {
+class BaseModel {
   /**
    * Invoke superclass constructor method to set up immutable instance
    */
   constructor (data) {
-    super()
     this.attrs = Immutable(data)
     Object.freeze(this.attrs)
   }
@@ -26,6 +26,20 @@ class BaseModel extends API {
    */
   get (keyPath) {
     return keypather.get(this.attrs, keyPath)
+  }
+
+  /**
+   * Centralized API resource request handling
+   * @param {Object} queryOpts
+   */
+  static resourceRequest (queryOpts) {
+    return httpClient(queryOpts)
+      .then((response) => {
+        if (!exists(response) || response.statusCode === 404) {
+          throw new Error(queryOpts)
+        }
+        return (Array.isArray(response.body)) ? response.body[0] : response.body
+      })
   }
 }
 
