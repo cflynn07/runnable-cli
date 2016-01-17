@@ -61,7 +61,7 @@ class InstanceModel extends BaseModel {
    * @returns Promise
    */
   start () {
-    return this.constructor.resourceRequest({
+    return this.constructor.instanceResourceRequest({
       method: 'PUT',
       url: [basePath, this.get('id'), 'actions/start'].join('/')
     })
@@ -77,7 +77,7 @@ class InstanceModel extends BaseModel {
    * @returns Promise
    */
   stop () {
-    return this.constructor.resourceRequest({
+    return this.constructor.instanceResourceRequest({
       method: 'PUT',
       url: [basePath, this.get('id'), 'actions/stop'].join('/')
     })
@@ -90,7 +90,7 @@ class InstanceModel extends BaseModel {
    * @returns Promise
    */
   restart () {
-    return this.constructor.resourceRequest({
+    return this.constructor.instanceResourceRequest({
       method: 'PUT',
       url: [basePath, this.get('id'), 'actions/restart'].join('/')
     })
@@ -103,7 +103,7 @@ class InstanceModel extends BaseModel {
    * @returns Promise
    */
   rebuild () {
-    return this.constructor.resourceRequest({
+    return this.constructor.instanceResourceRequest({
       method: 'POST',
       url: ['/builds', this.get('build.id'), 'actions/copy'].join('/'),
       qs: {
@@ -112,7 +112,7 @@ class InstanceModel extends BaseModel {
     })
     .then((build) => {
       // build the copied build
-      return this.constructor.resourceRequest({
+      return this.constructor.instanceResourceRequest({
         method: 'POST',
         url: ['/builds', build.id, 'actions/build'].join('/'),
         body: {
@@ -123,7 +123,7 @@ class InstanceModel extends BaseModel {
     })
     .then((build) => {
       // Update instance with the new build
-      return this.constructor.resourceRequest({
+      return this.constructor.instanceResourceRequest({
         method: 'PATCH',
         url: [basePath, this.get('id')].join('/'),
         body: {
@@ -175,7 +175,7 @@ class InstanceModel extends BaseModel {
         name: instanceName.toLowerCase()
       }
     }
-    return super.resourceRequest(queryOpts)
+    return super.instanceResourceRequest(queryOpts)
       .then(InstanceModel.instantiate)
       .catch((err) => {
         console.log('error?', err)

@@ -38,7 +38,7 @@ class UserModel extends BaseModel {
     const queryOpts = {
       url: [basePath, 'me'].join('/')
     }
-    return super.resourceRequest(queryOpts)
+    return super.instanceResourceRequest(queryOpts)
       .then(UserModel.instantiate)
   }
 }

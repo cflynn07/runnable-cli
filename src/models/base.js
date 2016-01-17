@@ -32,7 +32,7 @@ class BaseModel {
    * Centralized API resource request handling
    * @param {Object} queryOpts
    */
-  static resourceRequest (queryOpts) {
+  static instanceResourceRequest (queryOpts) {
     return httpClient(queryOpts)
       .then((response) => {
         if (!exists(response) || response.statusCode === 404) {
