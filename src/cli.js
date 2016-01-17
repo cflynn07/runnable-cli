@@ -6,6 +6,8 @@
  */
 'use strict'
 
+require('loadenv')()
+
 const defaults = require('101/defaults')
 defaults(process.env, {
   RUNNABLE_API_HOST: 'https://api.runnable.io',
