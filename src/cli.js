@@ -19,10 +19,11 @@ const isString = require('101/is-string')
 const open = require('open')
 const program = require('commander')
 
-const API = require('./api')
 const ContainerLogs = require('./container-logs')
+const ErrorInstance404 = require('./errors/instance-404')
 const Git = require('./git')
 const InstanceModel = require('./models/instance')
+const InstancesCollection = require('./collections/instances')
 const List = require('./list')
 const Output = require('./output')
 const Status = require('./status')
@@ -38,10 +39,7 @@ class CLI extends Output {
   constructor () {
     super()
 
-    this.api = new API()
     this.git = new Git()
-
-    bindAll(this.api)
     bindAll(this.git)
 
     program.version(packageJSON.version)
@@ -152,16 +150,18 @@ class CLI extends Output {
   _cmdStart (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.startInstance.bind(this.api))
+      .then((instance) => {
+        return instance.start()
+      })
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Starting server...'
         ].join('\n'))
       })
       .catch((err) => {
-        // console.log(err)
+        console.log(err.stack)
       })
       .finally(stopSpinner)
   }
@@ -173,11 +173,13 @@ class CLI extends Output {
   _cmdStop (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.stopInstance.bind(this.api))
+      .then((instance) => {
+        return instance.stop()
+      })
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Stopping server...'
         ].join('\n'))
       })
@@ -194,11 +196,13 @@ class CLI extends Output {
   _cmdRestart (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.stopInstance.bind(this.api))
+      .then((instance) => {
+        return instance.restart()
+      })
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Restarting server...'
         ].join('\n'))
       })
@@ -215,11 +219,13 @@ class CLI extends Output {
   _cmdRebuild (id) {
     var stopSpinner = this.spinner()
     this._fetchInstance(id)
-      .then(this.api.rebuildInstance.bind(this.api))
+      .then((instance) => {
+        return instance.rebuild()
+      })
       .then((instance) => {
         stopSpinner()
         this.toStdOut([
-          instance.instanceWebURL(),
+          instance.webURL(),
           'Rebuilding server...'
         ].join('\n'))
       })
@@ -236,22 +242,23 @@ class CLI extends Output {
     var stopSpinner = this.spinner()
     this.git.fetchRepositoryInfo()
       .catch(Git.errors.NotAGitRepoError, (err) => {
-        return this.api.fetchUser()
+        return UserModel.fetch()
       })
       .then((data) => {
         if (data instanceof UserModel) {
+          // catch handler for fetchRepositoryInfo invoked, returned UserModel fetch promise
           return data.get('accounts.github.username')
         } else {
           return data.orgName
         }
       })
-      .then(this.api.fetchInstances.bind(this.api))
+      .then(InstancesCollection.fetch)
       .then((instances) => {
         stopSpinner()
         new List(instances).output()
       })
       .catch((err) => {
-        // console.log(err)
+        console.log(err.stack)
       })
       .finally(stopSpinner)
   }
@@ -276,9 +283,9 @@ class CLI extends Output {
         stopSpinner()
         var url
         if (!target || target.toLowerCase() === 'runnable') {
-          url = instance.instanceWebURL()
+          url = instance.webURL()
         } else if (target.toLowerCase() === 'server') {
-          url = instance.instanceServerURL()
+          url = instance.serverURL()
         }
         open(url)
         this.toStdOut(url)
@@ -302,7 +309,7 @@ class CLI extends Output {
         status.output()
       })
       .catch((err) => {
-        // console.log(err.message, err.stack)
+        console.log(err.message, err.stack)
       })
       .finally(stopSpinner)
   }
@@ -328,27 +335,28 @@ class CLI extends Output {
   _fetchInstance (id) {
     var promise
 
-    var handleNotAGitRepoError = (err) => {
+    const handleNotAGitRepoError = (err) => {
       this.toStdOut('Not a git repository: ' + process.cwd())
       throw err
     }
 
-    var handleInstanceNotFoundError = (err) => {
-      var instanceIdentifier = (isString(err.queryData)) ? err.queryData :
+    const handleInstanceNotFoundError = (err) => {
+      var instanceIdentifier = (isString(err.queryData)) ?
+        err.queryData :
         [err.queryData.orgName,
-         InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)].join('/')
+        InstanceModel.instanceName(err.queryData.branch, err.queryData.repoName)].join('/')
       this.toStdOut('Instance not found: ' + instanceIdentifier)
       throw err
     }
 
     if (id) {
-      promise = this.api.fetchInstance(id)
-        .catch(API.errors.InstanceNotFoundError, handleInstanceNotFoundError)
+      promise = InstanceModel.fetch(id)
+        .catch(ErrorInstance404, handleInstanceNotFoundError)
     } else {
       promise = this.git.fetchRepositoryInfo()
         .catch(Git.errors.NotAGitRepoError, handleNotAGitRepoError)
-        .then(this.api.fetchInstance.bind(this.api))
-        .catch(API.errors.InstanceNotFoundError, handleInstanceNotFoundError)
+        .then(InstanceModel.fetch)
+        .catch(ErrorInstance404, handleInstanceNotFoundError)
     }
 
     return promise

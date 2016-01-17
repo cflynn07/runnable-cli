@@ -5,7 +5,9 @@
  */
 'use strict'
 
-var BaseModel = require('./base')
+const BaseModel = require('./base')
+
+const basePath = '/users'
 
 /**
  * Functionality related to instance resources
@@ -25,6 +27,19 @@ class UserModel extends BaseModel {
    */
   static instantiate (data) {
     return new UserModel(data)
+  }
+
+  /**
+   * Fetch a user object from API
+   * @returns Promise - resolves:
+   *   UserModel
+   */
+  static fetch () {
+    const queryOpts = {
+      url: [basePath, 'me'].join('/')
+    }
+    return super.instanceResourceRequest(queryOpts)
+      .then(UserModel.instantiate)
   }
 }
 
