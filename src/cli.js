@@ -41,9 +41,6 @@ class CLI extends Output {
   constructor () {
     super()
 
-    this.git = new Git()
-    bindAll(this.git)
-
     program.version(packageJSON.version)
 
     program
@@ -230,7 +227,8 @@ class CLI extends Output {
    */
   _cmdList (options) {
     var stopSpinner = this.spinner()
-    this.git.fetchRepositoryInfo()
+    var git = new Git()
+    git.fetchRepositoryInfo()
       .catch(Git.errors.NotAGitRepoError, () => {
         return UserModel.fetch()
       })
@@ -338,7 +336,8 @@ class CLI extends Output {
       promise = InstanceModel.fetch(id)
         .catch(ErrorInstance404, handleInstanceNotFoundError)
     } else {
-      promise = this.git.fetchRepositoryInfo()
+      let git = new Git()
+      promise = git.fetchRepositoryInfo()
         .catch(Git.errors.NotAGitRepoError, handleNotAGitRepoError)
         .then(InstanceModel.fetch)
         .catch(ErrorInstance404, handleInstanceNotFoundError)
