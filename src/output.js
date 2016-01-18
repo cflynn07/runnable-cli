@@ -1,7 +1,7 @@
 /**
  * Output command statuses and spinners to stdout
- * @module lib/output
- * @exports Function
+ * @module src/output
+ * @exports Class
  */
 'use strict'
 
@@ -12,13 +12,15 @@ const exists = require('101/exists')
 
 class Output {
   /**
-   *
+   * @constructor
+   * Set default spinner pattern
    */
   constructor () {
     Spinner.setDefaultSpinnerString(Spinner.spinners[9])
   }
 
   /**
+   * Create and start a new CLI spinner. Returns a function that clears the spinner when invoked.
    * @param {String} loadingMessage
    * @param {String|undefined} finalMessage
    * @param {Boolean|undefined} clear

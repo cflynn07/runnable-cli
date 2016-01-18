@@ -15,7 +15,6 @@ defaults(process.env, {
   RUNNABLE_CONTAINER_TLD: '.runnableapp.com'
 })
 
-const bindAll = require('101/bind-all')
 const isString = require('101/is-string')
 const open = require('open')
 const program = require('commander')

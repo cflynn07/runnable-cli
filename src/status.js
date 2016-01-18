@@ -51,7 +51,7 @@ class Status extends Table {
     this._pushRow(['status', instance.get('container.inspect.State.Status')])
     this._pushRow(['uptime',
                   moment.duration(instance.get('container.inspect.State.StartedAt')).humanize()])
-  /*
+  /* TODO
     if (options.E) {
       // Add ENV VARS to status output
       table = new Table(tableOpts)

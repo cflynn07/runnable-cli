@@ -1,5 +1,5 @@
 /**
- * @module lib/status_test
+ * @module src/status_test
  */
 'use strict'
 
@@ -9,7 +9,7 @@ const Status = require('./status')
 const Table = require('./table')
 const InstanceModel = require('./models/instance')
 
-describe('lib/status.js', () => {
+describe('src/status.js', () => {
   var instance
   var status
 
@@ -19,12 +19,10 @@ describe('lib/status.js', () => {
   })
 
   it('load', () => {
-    test
-      .function(Status)
-        .hasName('Status')
-      .object(new Status())
-        .isInstanceOf(Status)
-        .isInstanceOf(Table)
+    test.function(Status).hasName('Status')
+    test.object(new Status())
+      .isInstanceOf(Status)
+      .isInstanceOf(Table)
   })
 
   describe('Status class', () => {
