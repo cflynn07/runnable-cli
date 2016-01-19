@@ -81,6 +81,7 @@ function NotAGitRepoError (message) {
   this.message = message
 }
 NotAGitRepoError.prototype = Object.create(Error.prototype)
+NotAGitRepoError.prototype.constructor = NotAGitRepoError
 
 module.exports = Git
 module.exports.errors = Object.freeze({

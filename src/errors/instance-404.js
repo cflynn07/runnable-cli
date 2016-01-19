@@ -11,7 +11,7 @@
 function Instance404 (queryData) {
   this.queryData = queryData
 }
-
 Instance404.prototype = Object.create(Error.prototype)
+Instance404.prototype.constructor = Instance404
 
 module.export = Instance404

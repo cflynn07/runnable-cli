@@ -4,8 +4,6 @@
  */
 'use strict'
 
-require('colors')
-
 const fs = require('fs')
 const nodeWatch = require('node-watch')
 const path = require('path')
