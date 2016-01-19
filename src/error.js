@@ -9,5 +9,5 @@
  * @param {Error} err
  */
 module.exports = (err) => {
-  console.log(err, err.stack)
+  if (process.env.RUNNABLE_CLI_LOG_ERRORS) console.log(err, err.stack)
 }
