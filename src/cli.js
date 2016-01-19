@@ -332,8 +332,8 @@ class CLI extends Output {
         })
       return InstanceModel.fetch(instanceQuery)
     })()
-    .catch(ErrorGitNoRepo, handleErrorGitNoRepo)
-    .catch(ErrorInstance404, handleErrorInstance404)
+      .catch(ErrorGitNoRepo, handleErrorGitNoRepo)
+      .catch(ErrorInstance404, handleErrorInstance404)
   }
 }
 
