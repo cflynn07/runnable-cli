@@ -6,6 +6,7 @@
  */
 'use strict'
 
+require('babel-polyfill')
 require('loadenv')()
 
 const defaults = require('101/defaults')
@@ -15,6 +16,7 @@ defaults(process.env, {
   RUNNABLE_CONTAINER_TLD: '.runnableapp.com'
 })
 
+const Promise = require('bluebird')
 const isString = require('101/is-string')
 const open = require('open')
 const program = require('commander')
@@ -314,8 +316,6 @@ class CLI extends Output {
    * @returns Promise
    */
   _fetchInstance (id) {
-    var promise
-
     const handleNotAGitRepoError = (err) => {
       this.toStdOut('Not a git repository: ' + process.cwd())
       throw err
@@ -331,18 +331,18 @@ class CLI extends Output {
       throw err
     }
 
-    if (id) {
-      promise = InstanceModel.fetch(id)
-        .catch(ErrorInstance404, handleInstanceNotFoundError)
-    } else {
-      let git = new Git()
-      promise = git.fetchRepositoryInfo()
-        .catch(Git.errors.NotAGitRepoError, handleNotAGitRepoError)
-        .then(InstanceModel.fetch)
-        .catch(ErrorInstance404, handleInstanceNotFoundError)
-    }
-
-    return promise
+    return Promise.coroutine(function*() {
+      const git = new Git()
+      const instanceQuery = yield git.fetchRepositoryInfo()
+        .catch(Git.errors.NotAGitRepoError, (err) => {
+          // If this is not a git repo, and no branch was specified, throw error
+          if (!id) throw err
+          return id
+        })
+      return InstanceModel.fetch(instanceQuery)
+    })()
+    .catch(Git.errors.NotAGitRepoError, handleNotAGitRepoError)
+    .catch(ErrorInstance404, handleInstanceNotFoundError)
   }
 }
 
