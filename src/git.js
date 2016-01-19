@@ -73,17 +73,4 @@ class Git {
   }
 }
 
-/**
- * Command run in a directory that is not a git repository
- * @param {String} message
- */
-function NotAGitRepoError (message) {
-  this.message = message
-}
-NotAGitRepoError.prototype = Object.create(Error.prototype)
-NotAGitRepoError.prototype.constructor = NotAGitRepoError
-
 module.exports = Git
-module.exports.errors = Object.freeze({
-  NotAGitRepoError: NotAGitRepoError
-})

@@ -22,6 +22,7 @@ const open = require('open')
 const program = require('commander')
 
 const ContainerLogs = require('./container-logs')
+const ErrorGitNoRepo = require('./errors/git-no-repo.js')
 const ErrorInstance404 = require('./errors/instance-404')
 const Git = require('./git')
 const InstanceModel = require('./models/instance')
@@ -316,12 +317,12 @@ class CLI extends Output {
    * @returns Promise
    */
   _fetchInstance (id) {
-    const handleNotAGitRepoError = (err) => {
+    const handleErrorGitNoRepo = (err) => {
       this.toStdOut('Not a git repository: ' + process.cwd())
       throw err
     }
 
-    const handleInstanceNotFoundError = (err) => {
+    const handleErrorInstance404 = (err) => {
       var instanceIdentifier = (isString(err.queryData)) ? err.queryData
         : [
           err.queryData.orgName,
@@ -341,8 +342,8 @@ class CLI extends Output {
         })
       return InstanceModel.fetch(instanceQuery)
     })()
-    .catch(Git.errors.NotAGitRepoError, handleNotAGitRepoError)
-    .catch(ErrorInstance404, handleInstanceNotFoundError)
+    .catch(ErrorGitNoRepo, handleErrorGitNoRepo)
+    .catch(ErrorInstance404, handleErrorInstance404)
   }
 }
 
