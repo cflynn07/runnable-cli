@@ -237,7 +237,7 @@ class CLI extends Output {
       const instances = yield InstancesCollection.fetch(orgName)
       stopSpinner()
       new List(instances).output()
-    }.bind(this))()
+    })()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -260,6 +260,7 @@ class CLI extends Output {
     Promise.coroutine(function *() {
       const instance = yield this._fetchInstance(id)
       stopSpinner()
+      var url
       if (!target || target.toLowerCase() === 'runnable') {
         url = instance.webURL()
       } else if (target.toLowerCase() === 'server') {
