@@ -2,6 +2,7 @@
  * @module lib/list
  * @exports {Function}
  */
+'use strict'
 
 const Table = require('./Table')
 

@@ -21,6 +21,14 @@ describe('src/output.js', () => {
   })
 
   describe('Output class', () => {
+    beforeEach(() => {
+      test.stub(console, 'log')
+    })
+
+    afterEach(() => {
+      console.log.restore()
+    })
+
     describe('constructor', () => {
       beforeEach(() => {
         test.stub(Spinner, 'setDefaultSpinnerString')
@@ -41,13 +49,13 @@ describe('src/output.js', () => {
       beforeEach(() => {
         test.stub(Spinner.prototype, 'start')
         test.stub(Spinner.prototype, 'stop')
-        test.stub(console, 'log')
+        test.stub(output, 'colorize')
       })
 
       afterEach(() => {
         Spinner.prototype.start.restore()
         Spinner.prototype.stop.restore()
-        console.log.restore()
+        output.colorize.restore()
       })
 
       it('should start a spinner and return a spinner cancel function', () => {
@@ -58,6 +66,8 @@ describe('src/output.js', () => {
       })
 
       it('cancel function should stop spinner, optionally clear, only run one time', () => {
+        output.colorize.returns('%s ')
+
         const stopSpin = output.spinner('%s', 'final message', true)
 
         // stopSpin returns arguments that were passed to it
@@ -76,12 +86,46 @@ describe('src/output.js', () => {
         test.sinon.assert.calledOnce(Spinner.prototype.stop)
         test.sinon.assert.calledOnce(console.log)
       })
+
+      it('should not log final message if 2nd argument not provided', () => {
+        const stopSpin = output.spinner('%s')
+        stopSpin()
+        test.sinon.assert.notCalled(console.log)
+      })
+
+      it('should default to %s loading message', () => {
+        const stopSpin = output.spinner()
+        stopSpin()
+        test.sinon.assert.calledOnce(output.colorize)
+        test.sinon.assert.calledWith(output.colorize, '%s ')
+      })
     })
 
     describe('Output.prototype.toStdOut', () => {
+      beforeEach(() => {
+        test.stub(output, 'colorize')
+        output.currentSpinnerStop = test.stub()
+      })
+
+      afterEach(() => {
+        output.colorize.restore()
+      })
+
+      it('should apply color to output string if no second argument provided', () => {
+        output.toStdOut('test string 1')
+        test.sinon.assert.calledOnce(output.colorize)
+        test.sinon.assert.calledWith(output.colorize, 'test string 1')
+        test.sinon.assert.calledOnce(output.currentSpinnerStop)
+      })
     })
 
     describe('Output.prototype.colorize', () => {
+      it('should return colorized version of string', () => {
+        var message = 'test message 1'
+        console.log('what is output?', output)
+        var result = output.colorize(message)
+        test.value(result).is(message.magenta)
+      })
     })
   })
 })

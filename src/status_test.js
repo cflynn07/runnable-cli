@@ -5,9 +5,9 @@
 
 const test = require('unit.js')
 
+const InstanceModel = require('./models/instance')
 const Status = require('./status')
 const Table = require('./table')
-const InstanceModel = require('./models/instance')
 
 describe('src/status.js', () => {
   var instance
