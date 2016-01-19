@@ -332,14 +332,14 @@ class CLI extends Output {
       throw err
     }
 
-    return Promise.coroutine(function*() {
+    return Promise.coroutine(function *() {
       const git = new Git()
       const instanceQuery = yield git.fetchRepositoryInfo()
-        .catch(Git.errors.NotAGitRepoError, (err) => {
-          // If this is not a git repo, and no branch was specified, throw error
-          if (!id) throw err
-          return id
-        })
+      .catch(ErrorGitNoRepo, (err) => {
+        // If this is not a git repo, and no branch was specified, throw error
+        if (!id) throw err
+        return id
+      })
       return InstanceModel.fetch(instanceQuery)
     })()
     .catch(ErrorGitNoRepo, handleErrorGitNoRepo)

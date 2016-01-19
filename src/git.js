@@ -11,6 +11,8 @@ const hasKeypaths = require('101/has-keypaths')
 const pluck = require('101/pluck')
 const simpleGit = require('simple-git')
 
+const ErrorGitNoRepo = require('./errors/git-no-repo.js')
+
 class Git {
   constructor () {
     this._simpleGit = simpleGit(process.cwd())
@@ -68,7 +70,7 @@ class Git {
    */
   _handleError (err) {
     if (/^fatal: Not a git repository/.test(err.message)) {
-      throw new NotAGitRepoError(err.message)
+      throw new ErrorGitNoRepo(err.message)
     }
   }
 }
