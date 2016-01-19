@@ -42,10 +42,10 @@ class Watcher extends Output {
    * repository. Process the file if it is not ignored.
    */
   watch () {
-    var git = new Git()
-    var cwd = process.cwd()
+    const git = new Git()
+    const cwd = process.cwd()
     nodeWatch(process.cwd(), (filePath) => {
-      var rel = path.relative(cwd, filePath)
+      const rel = path.relative(cwd, filePath)
       Promise.coroutine(function *() {
         const excluded = yield git.checkIgnore(rel)
         if (!excluded) {
@@ -59,7 +59,6 @@ class Watcher extends Output {
    * @param {String} filePath - relative filepath
    */
   _handleFileChange (filePath) {
-    // var contents = '';
     const spinStringBase = [
       './',
       filePath,
