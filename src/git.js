@@ -29,28 +29,20 @@ class Git {
    *   - repoName: {String}
    */
   fetchRepositoryInfo () {
-    var fetchBranch = this._simpleGit.revparse(['--abbrev-ref', 'HEAD'])
-      .then((status) => {
-        return status.replace(/\n$/, '')
-      }, this._handleError)
-
-    var fetchRemote = this._simpleGit.getRemotes(true)
-      .then((remotes) => {
-        var originRemote = find(remotes, hasKeypaths({name: 'origin'}))
-        if (!originRemote) {
-          throw new Error('No "origin" remote found for repository')
-        }
-        var matches = originRemote.refs.fetch.match(/(\:|\/)([A-z0-9-_]+)\/([A-z0-9-_]+)(\.git|)$/)
-        return {
-          orgName: matches[2],
-          repoName: matches[3]
-        }
-      }, this._handleError)
-
-    return Promise.join(fetchBranch, fetchRemote, (branch, remote) => {
-      remote.branch = branch
-      return remote
-    })
+    return Promise.coroutine(function *() {
+      const branch = yield this._simpleGit.revparse(['--abbrev-ref', 'HEAD'])
+      const remotes = yield this._simpleGit.getRemotes(true)
+      const originRemote = find(remotes, hasKeypaths({name: 'origin'}))
+      if (!originRemote) { throw new Error('No "origin" remote found for repository') }
+      const originRegexMatches = originRemote.refs.fetch
+        .match(/(\:|\/)([A-z0-9-_]+)\/([A-z0-9-_]+)(\.git|)$/)
+      return {
+        branch: branch.replace(/\n$/, ''),
+        orgName: originRegexMatches[2],
+        repoName: originRegexMatches[3]
+      }
+    }.bind(this))()
+      .catch(this._handleError)
   }
 
   /**
@@ -60,8 +52,11 @@ class Git {
    * @return Promise - will resolve Boolean
    */
   checkIgnore (relativePath) {
-    return this._simpleGit.checkIgnore(relativePath)
-      .then(compose(Boolean, pluck('length')))
+    return Promise.coroutine(function *() {
+      const ignoredFiles = yield this._simpleGit.checkIgnore(relativePath)
+      return compose(Boolean, pluck('length'))(ignoredFiles)
+    }.bind(this))()
+      .catch(this._handleError)
   }
 
   /**
