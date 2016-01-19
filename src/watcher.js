@@ -4,6 +4,7 @@
  */
 'use strict'
 
+const Promise = require('bluebird')
 const fs = require('fs')
 const nodeWatch = require('node-watch')
 const path = require('path')
@@ -45,9 +46,12 @@ class Watcher extends Output {
     var cwd = process.cwd()
     nodeWatch(process.cwd(), (filePath) => {
       var rel = path.relative(cwd, filePath)
-      git.checkIgnore(rel).then((excluded) => {
-        if (!excluded) { this._handleFileChange(rel) }
-      })
+      Promise.coroutine(function *() {
+        const excluded = yield git.checkIgnore(rel)
+        if (!excluded) {
+          this._handleFileChange(rel)
+        }
+      }.bind(this))()
     })
   }
 
@@ -56,7 +60,7 @@ class Watcher extends Output {
    */
   _handleFileChange (filePath) {
     // var contents = '';
-    var spinStringBase = [
+    const spinStringBase = [
       './',
       filePath,
       ' --> [remote]:',
@@ -66,19 +70,18 @@ class Watcher extends Output {
       filePath
     ].join('')
 
-    var stats = this._fetchContents(filePath)
+    const stats = this._fetchContents(filePath)
     if (stats.deleted) {
       // spinString += ' DELETE'
       // spinner = new Spinner(spinString.magenta)
       // spinner.start()
       // spinner.stop()
     } else {
-      var stopSpinner = this.spinner(spinStringBase + ' %s', spinStringBase + ' [complete]')
-      this._instance.uploadFile(filePath, stats.contents)
-        .then((instance) => {
-          stopSpinner()
-          this._instance = instance
-        })
+      const stopSpinner = this.spinner(spinStringBase + ' %s', spinStringBase + ' [complete]')
+      Promise.coroutine(function *() {
+        this._instance = yield this._instance.uploadFile(filePath, stats.contents)
+        stopSpinner()
+      }.bind(this))()
     }
   }
 
