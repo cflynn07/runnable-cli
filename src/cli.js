@@ -111,14 +111,15 @@ class CLI extends Output {
    * Tail the stdout of a Runnable server.
    */
   _cmdLogs () {
-    var stopSpinner = this.spinner()
-    this._fetchInstance()
-      .then((instance) => {
-        stopSpinner()
-        new ContainerLogs(instance.get('container.dockerHost'),
-                          instance.get('container.dockerContainer'))
-          .fetchAndPipeToStdout()
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      var instance = yield this._fetchInstance()
+      stopSpinner()
+      new ContainerLogs(
+        instance.get('container.dockerHost'),
+        instance.get('container.dockerContainer')
+      ).fetchAndPipeToStdout()
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -128,14 +129,15 @@ class CLI extends Output {
    * @param {String|undefined} id - instance shortHash
    */
   _cmdSSH (id) {
-    var stopSpinner = this.spinner()
-    this._fetchInstance(id)
-      .then((instance) => {
-        stopSpinner()
-        new Terminal(instance.get('container.dockerHost'),
-                     instance.get('container.dockerContainer'))
-          .fetchAndPipeToStdout()
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      var instance = yield this._fetchInstance(id)
+      stopSpinner()
+      new Terminal(
+        instance.get('container.dockerHost'),
+        instance.get('container.dockerContainer')
+      ).fetchAndPipeToStdout()
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -145,18 +147,16 @@ class CLI extends Output {
    * @param {String|undefined} id - instance shortHash
    */
   _cmdStart (id) {
-    var stopSpinner = this.spinner()
-    this._fetchInstance(id)
-      .then((instance) => {
-        return instance.start()
-      })
-      .then((instance) => {
-        stopSpinner()
-        this.toStdOut([
-          instance.webURL(),
-          'Starting server...'
-        ].join('\n'))
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      var instance = yield this._fetchInstance(id)
+      instance = yield instance.start()
+      stopSpinner()
+      this.toStdOut([
+        instance.webURL(),
+        'Starting server...'
+      ].join('\n'))
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -166,18 +166,16 @@ class CLI extends Output {
    * @param {String|undefined} id - instance shortHash
    */
   _cmdStop (id) {
-    var stopSpinner = this.spinner()
-    this._fetchInstance(id)
-      .then((instance) => {
-        return instance.stop()
-      })
-      .then((instance) => {
-        stopSpinner()
-        this.toStdOut([
-          instance.webURL(),
-          'Stopping server...'
-        ].join('\n'))
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      var instance = yield this._fetchInstance(id)
+      instance = yield instance.stop()
+      stopSpinner()
+      this.toStdOut([
+        instance.webURL(),
+        'Stopping server...'
+      ].join('\n'))
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -187,18 +185,16 @@ class CLI extends Output {
    * @param {String|undefined} id - instance shortHash
    */
   _cmdRestart (id) {
-    var stopSpinner = this.spinner()
-    this._fetchInstance(id)
-      .then((instance) => {
-        return instance.restart()
-      })
-      .then((instance) => {
-        stopSpinner()
-        this.toStdOut([
-          instance.webURL(),
-          'Restarting server...'
-        ].join('\n'))
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      var instance = yield this._fetchInstance(id)
+      instance = yield instance.restart()
+      stopSpinner()
+      this.toStdOut([
+        instance.webURL(),
+        'Restarting server...'
+      ].join('\n'))
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -208,18 +204,16 @@ class CLI extends Output {
    * @param {String|undefined} id - instance shortHash
    */
   _cmdRebuild (id) {
-    var stopSpinner = this.spinner()
-    this._fetchInstance(id)
-      .then((instance) => {
-        return instance.rebuild()
-      })
-      .then((instance) => {
-        stopSpinner()
-        this.toStdOut([
-          instance.webURL(),
-          'Rebuilding server...'
-        ].join('\n'))
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      var instance = yield this._fetchInstance(id)
+      instance = yield instance.rebuild()
+      stopSpinner()
+      this.toStdOut([
+        instance.webURL(),
+        'Rebuilding server...'
+      ].join('\n'))
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -228,25 +222,22 @@ class CLI extends Output {
    * Fetch a list of Runnable servers
    */
   _cmdList (options) {
-    var stopSpinner = this.spinner()
-    var git = new Git()
-    git.fetchRepositoryInfo()
-      .catch(Git.errors.NotAGitRepoError, () => {
-        return UserModel.fetch()
-      })
-      .then((data) => {
-        if (data instanceof UserModel) {
-          // catch handler for fetchRepositoryInfo invoked, returned UserModel fetch promise
-          return data.get('accounts.github.username')
-        } else {
-          return data.orgName
-        }
-      })
-      .then(InstancesCollection.fetch)
-      .then((instances) => {
-        stopSpinner()
-        new List(instances).output()
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      const repoInfo = yield new Git()
+        .fetchRepositoryInfo()
+        .catch(ErrorGitNoRepo, () => {})
+      var orgName
+      if (repoInfo) {
+        orgName = repoInfo.orgName
+      } else {
+        let user = yield UserModel.fetch()
+        orgName = user.get('accounts.github.username')
+      }
+      const instances = yield InstancesCollection.fetch(orgName)
+      stopSpinner()
+      new List(instances).output()
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -265,19 +256,18 @@ class CLI extends Output {
     }
     // console.log('Opening a Runnable page in the default browser...'.magenta)
     // TODO handle ports
-    var stopSpinner = this.spinner()
-    this._fetchInstance(id)
-      .then((instance) => {
-        stopSpinner()
-        var url
-        if (!target || target.toLowerCase() === 'runnable') {
-          url = instance.webURL()
-        } else if (target.toLowerCase() === 'server') {
-          url = instance.serverURL()
-        }
-        open(url)
-        this.toStdOut(url)
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      const instance = yield this._fetchInstance(id)
+      stopSpinner()
+      if (!target || target.toLowerCase() === 'runnable') {
+        url = instance.webURL()
+      } else if (target.toLowerCase() === 'server') {
+        url = instance.serverURL()
+      }
+      open(url)
+      this.toStdOut(url)
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -287,13 +277,12 @@ class CLI extends Output {
    * @param {String|undefined} id - instance shortHash
    */
   _cmdStatus (id, options) {
-    var stopSpinner = this.spinner()
-    this._fetchInstance(id)
-      .then((instance) => {
-        stopSpinner()
-        var status = new Status(instance)
-        status.output()
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      const instance = yield this._fetchInstance(id)
+      stopSpinner()
+      new Status(instance).output()
+    }.bind(this))()
       .catch(error)
       .finally(stopSpinner)
   }
@@ -302,13 +291,14 @@ class CLI extends Output {
    * Watch a repository and automatically upload changed files to a Runnable server
    */
   _cmdWatch () {
-    var stopSpinner = this.spinner()
-    this._fetchInstance()
-      .then((instance) => {
-        stopSpinner()
-        var watcher = new Watcher(instance)
-        watcher.watch()
-      })
+    const stopSpinner = this.spinner()
+    Promise.coroutine(function *() {
+      const instance = yield this._fetchInstance()
+      stopSpinner()
+      new Watcher(instance).watch()
+    }.bind(this))()
+      .catch(error)
+      .finally(stopSpinner)
   }
 
   /**
@@ -335,11 +325,11 @@ class CLI extends Output {
     return Promise.coroutine(function *() {
       const git = new Git()
       const instanceQuery = yield git.fetchRepositoryInfo()
-      .catch(ErrorGitNoRepo, (err) => {
-        // If this is not a git repo, and no branch was specified, throw error
-        if (!id) throw err
-        return id
-      })
+        .catch(ErrorGitNoRepo, (err) => {
+          // If this is not a git repo, and no branch was specified, throw error
+          if (!id) throw err
+          return id
+        })
       return InstanceModel.fetch(instanceQuery)
     })()
     .catch(ErrorGitNoRepo, handleErrorGitNoRepo)
