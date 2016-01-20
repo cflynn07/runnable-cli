@@ -1,6 +1,13 @@
 <img src="https://runnable.io/build/images/runnabear-head.png" width="150"> Runnable CLI (PRE-RELEASE ALPHA)
 ==========
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
+[![Build Status](https://travis-ci.org/cflynn07/runnable-cli.svg)](https://travis-ci.org/cflynn07/runnable-cli)
+[![Code Climate](https://codeclimate.com/github/cflynn07/runnable-cli/badges/gpa.svg)](https://codeclimate.com/github/cflynn07/runnable-cli)
+[![codecov.io](https://codecov.io/github/cflynn07/runnable-cli/coverage.svg?branch=master)](https://codecov.io/github/cflynn07/runnable-cli?branch=master)
+[![Dependency Status](https://david-dm.org/cflynn07/runnable-cli.svg)](https://david-dm.org/cflynn07/runnable-cli)
+[![devDependency Status](https://david-dm.org/cflynn07/runnable-cli/dev-status.svg)](https://david-dm.org/cflynn07/runnable-cli#info=devDependencies)
+
+[![NPM](https://nodei.co/npm/array-subtract.png?compact=true)](https://nodei.co/npm/array-subtract/)
 
 The Runnable CLI is an interface to the Runnable Platform API. Supported features include log
 tailing, terminal sessions, starting/stopping/restarting Servers, status inspection, etc. Use the
