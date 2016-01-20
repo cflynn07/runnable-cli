@@ -4,7 +4,7 @@
  */
 'use strict'
 
-const Table = require('./Table')
+const Table = require('./table')
 
 class List extends Table {
   /**
